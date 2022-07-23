@@ -1,5 +1,6 @@
 import 'package:car_book_app/home_login.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,8 +30,14 @@ class MyApp extends StatelessWidget {
     // );
 
     return MaterialApp(
-      home: LoginPage(),
-    );
+        // home: LoginPage(),
+        theme: ThemeData(primarySwatch: Colors.deepPurple),
+        darkTheme: ThemeData(brightness: Brightness.dark),
+        themeMode: ThemeMode.light,
+        routes: {
+          "/": (context) => LoginPage(),
+          "/login": (context) => LoginPage()
+        });
   }
 }
 
