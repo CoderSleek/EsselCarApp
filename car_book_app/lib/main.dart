@@ -1,4 +1,5 @@
 import 'package:car_book_app/home_login.dart';
+import 'package:car_book_app/startpage.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         routes: {
           "/": (context) => LoginPage(),
-          MyRoutes.loginRoute: (context) => LoginPage()
+          MyRoutes.loginRoute: (context) => LoginPage(),
+          MyRoutes.startPage: (context) => StartPage(),
         });
   }
 }
