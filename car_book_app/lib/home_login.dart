@@ -11,40 +11,48 @@ class LoginPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          const Text(
-            "Login Page",
-            style: TextStyle(
-              fontSize: 40,
-              fontFamily: "Sans",
-              color: Colors.blue,
-              // fontFamilyFallback: ["Times new Roman"],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+              "Welcome",
+              style: TextStyle(
+                fontSize: 40,
+                fontFamily: "Sans",
+                color: Colors.blue,
+                // fontFamilyFallback: ["Times new Roman"],
+              ),
+              softWrap: false,
             ),
-            softWrap: false,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Enter Employee ID",
-                    labelText: "User ID",
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Enter Employee ID",
+                      labelText: "User ID",
+                    ),
                   ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Enter Employee password",
-                    labelText: "Password",
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Enter Employee password",
+                      labelText: "Password",
+                    ),
+                    obscureText: true,
                   ),
-                  obscureText: true,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          ElevatedButton(onPressed: () {}, child: const Text("Login")),
-        ],
+            ElevatedButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                minimumSize: const Size(100, 30),
+              ),
+              child: const Text("Login"),
+            ),
+          ],
+        ),
       ),
       drawer: const Drawer(),
     );
