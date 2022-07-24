@@ -47,7 +47,7 @@ class LoginPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                minimumSize: const Size(100, 30),
+                minimumSize: const Size(120, 30),
               ),
               child: const Text("Login"),
             ),
