@@ -1,6 +1,11 @@
+import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
+  VoidCallback? navi(context) {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +50,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: navi,
               style: TextButton.styleFrom(
                 minimumSize: const Size(120, 30),
               ),
