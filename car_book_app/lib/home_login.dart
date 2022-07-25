@@ -5,13 +5,13 @@ import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
+  static String uid = "";
+  static String _pas = "";
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String _uid = "";
-  String _pas = "";
   final _isvalid = RegExp(r'^[a-zA-Z0-9]+$');
 
   bool changeButton =
@@ -38,9 +38,9 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         changeButton = true;
       });
-      await Future.delayed(const Duration(milliseconds: 5000));
+      await Future.delayed(const Duration(milliseconds: 500));
       // ignore: use_build_context_synchronously
-      // Navigator.pushReplacementNamed(context, MyRoutes.startPage);
+      Navigator.pushReplacementNamed(context, MyRoutes.startRoute);
     }
   }
 
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     TextFormField(
                       maxLength: 30,
-                      onChanged: (val) => {_uid = val},
+                      onChanged: (val) => {LoginPage.uid = val},
                       decoration: const InputDecoration(
                         hintText: "Enter Employee ID",
                         labelText: "User ID",
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       maxLength: 30,
-                      onChanged: (val) => {_pas = val},
+                      onChanged: (val) => {LoginPage._pas = val},
                       decoration: const InputDecoration(
                         hintText: "Enter Employee password",
                         labelText: "Password",
