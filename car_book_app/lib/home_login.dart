@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text(
           "Car Booking App",
         ),
-        backgroundColor: Colors.deepPurple,
+        // backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -130,36 +130,9 @@ class _LoginPageState extends State<LoginPage> {
               child:
                   changeButton ? const Icon(Icons.done) : const Text("Login"),
             ),
-            Material(
-              color: Colors.teal,
-              // animationDuration: const Duration(microseconds: 1),
-              borderRadius: BorderRadius.circular(100), //needs to be same as *1
-              child: InkWell(
-                radius: 600, //speed
-                borderRadius: BorderRadius.circular(100), //*1
-                // focusColor: Colors.white,
-                splashColor: Colors.blue.shade500, //holdcolor
-                highlightColor: Colors.blue.shade700, //fullholdcolor
-                onTap: () async {
-                  setState(() {});
-                },
-                child: AnimatedContainer(
-                  // color: Colors.greenAccent,
-                  duration: const Duration(seconds: 1),
-                  width: 150,
-                  height: 40,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.pets,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
-      drawer: const Drawer(),
     );
   }
 }
