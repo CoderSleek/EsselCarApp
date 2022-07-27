@@ -11,6 +11,8 @@ class CreateBooking extends StatefulWidget {
 class _CreateBookingState extends State<CreateBooking> {
   final TextEditingController _dateinput = TextEditingController();
   final TextEditingController _selectedTime = TextEditingController();
+  final TextEditingController _expectedTime = TextEditingController();
+  static DateTime changedVal = DateTime.now();
 
   final _createBookingKey = GlobalKey<FormState>();
   void validateBookingInformation() {
@@ -20,6 +22,37 @@ class _CreateBookingState extends State<CreateBooking> {
       print("some error");
     }
   }
+
+  Widget cupertinomaker() => SizedBox(
+        height: 200,
+        child: CupertinoDatePicker(
+          onDateTimeChanged: (val) {
+            // _expectedTime.text = TimeOfDay.fromDateTime(val).format(context);
+            changedVal = val;
+            _expectedTime.text =
+                DateFormat('hh:mm a,  dd-MM-yyyy').format(changedVal);
+          },
+          initialDateTime: changedVal,
+          mode: CupertinoDatePickerMode.dateAndTime,
+        ),
+      );
+
+  static void showSheet(
+          {required BuildContext context,
+          required Widget child,
+          required VoidCallback onClicked}) =>
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => CupertinoActionSheet(
+          actions: [
+            child,
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: onClicked,
+            child: const Text("Done"),
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +140,29 @@ class _CreateBookingState extends State<CreateBooking> {
                       color: Colors.blue,
                     ),
                     labelText: "Pick-up Time",
+                  ),
+                ),
+                // const TextField(),
+                TextFormField(
+                  controller: _expectedTime,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                      icon: Icon(
+                        Icons.time_to_leave,
+                        // CupertinoIcons.timer_fill,
+                        // Icons.more_time,
+                        color: Colors.blue,
+                      ),
+                      labelText: "Expected Date & time of arrival",
+                      hintText: "Time(hh:mm) Date(dd-mm-yyyy)"),
+                  onTap: () => showSheet(
+                    context: context,
+                    child: cupertinomaker(),
+                    onClicked: () {
+                      _expectedTime.text =
+                          DateFormat('hh:mm a,  dd-MM-yyyy').format(changedVal);
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
                 const TextField(
