@@ -109,6 +109,12 @@ class _CreateBookingState extends State<CreateBooking> {
                     labelText: "Pick-up Time",
                   ),
                 ),
+                const TextField(
+                  decoration: InputDecoration(
+                    label: Text("Additional Information"),
+                    hintText: "Optional",
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: validateBookingInformation,
                   child: const Text("Press me"),
