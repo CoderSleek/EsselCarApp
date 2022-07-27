@@ -45,8 +45,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   String? validateInputs(String? value, String item, int numOfChars) {
-    if (value == null) return null;
-    if (value.isEmpty) {
+    if (value!.isEmpty) {
       return "$item must not be empty";
     } else if (value.length < numOfChars) {
       return "$item cannot be less than $numOfChars charachter";
@@ -87,24 +86,24 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     TextFormField(
                       maxLength: 30,
-                      onChanged: (val) => {LoginPage.uid = val},
                       decoration: const InputDecoration(
                         hintText: "Enter Employee ID",
                         labelText: "User ID",
                       ),
                       validator: (value) {
+                        LoginPage.uid = value.toString();
                         return validateInputs(value, "ID", 0);
                       },
                     ),
                     TextFormField(
                       maxLength: 30,
-                      onChanged: (val) => {LoginPage._pas = val},
                       decoration: const InputDecoration(
                         hintText: "Enter Employee password",
                         labelText: "Password",
                       ),
                       obscureText: true,
                       validator: (value) {
+                        LoginPage._pas = value.toString();
                         return validateInputs(value, "Password", 6);
                       },
                     ),

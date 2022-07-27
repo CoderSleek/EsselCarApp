@@ -5,8 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatelessWidget {
-  void changeScreen() {}
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -35,11 +33,14 @@ class MyDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            const ListTile(
-              onTap: changeScreen(),
-              leading: Icon(Icons.logout_rounded),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    MyRoutes.loginRoute, (Route<dynamic> route) => false);
+              },
+              leading: const Icon(Icons.logout_rounded),
               iconColor: Colors.white,
-              title: Text(
+              title: const Text(
                 "Logout",
                 textScaleFactor: 0.9,
                 overflow: TextOverflow.fade,

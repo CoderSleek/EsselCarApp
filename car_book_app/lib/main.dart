@@ -1,3 +1,4 @@
+import 'package:car_book_app/createbooking.dart';
 import 'package:car_book_app/home_login.dart';
 import 'package:car_book_app/startpage.dart';
 import 'package:car_book_app/utils/routes.dart';
@@ -37,9 +38,10 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(brightness: Brightness.dark),
         themeMode: ThemeMode.light,
         routes: {
-          "/": (context) => LoginPage(),
+          "/": (context) => CreateBooking(),
           MyRoutes.loginRoute: (context) => LoginPage(),
           MyRoutes.startRoute: (context) => StartPage(),
+          MyRoutes.createBooking: (context) => CreateBooking(),
         });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:car_book_app/utils/routes.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
 
@@ -32,8 +33,8 @@ class _StartPageState extends State<StartPage> {
                   // focusColor: Colors.white,
                   splashColor: Colors.blue.shade500, //holdcolor
                   highlightColor: Colors.blue.shade700, //fullholdcolor
-                  onTap: () async {
-                    setState(() {});
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutes.createBooking);
                   },
                   child: AnimatedContainer(
                     // color: Colors.greenAccent,
