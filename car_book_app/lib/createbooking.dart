@@ -2,6 +2,7 @@ import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class CreateBooking extends StatefulWidget {
   @override
@@ -9,15 +10,30 @@ class CreateBooking extends StatefulWidget {
 }
 
 class _CreateBookingState extends State<CreateBooking> {
+  final TextEditingController _travelPurpose = TextEditingController();
   final TextEditingController _dateinput = TextEditingController();
   final TextEditingController _selectedTime = TextEditingController();
   final TextEditingController _expectedTime = TextEditingController();
-  static DateTime changedVal = DateTime.now();
+  final TextEditingController _additionalInput = TextEditingController();
+
+  static DateTime arrivalTime = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+    DateTime.now().hour,
+    ((DateTime.now().minute ~/ 10) * 10).toInt(),
+  );
 
   final _createBookingKey = GlobalKey<FormState>();
   void validateBookingInformation() {
     if (_createBookingKey.currentState!.validate()) {
-      print("validated");
+      var json = {
+        'travelPurpose': _travelPurpose.text,
+        'pickUpTimeDate': "${_selectedTime.text},  ${_dateinput.text}",
+        'arrivalTimeDate': _expectedTime.text,
+        'additionalInfo': _additionalInput.text,
+      };
+      print(json);
     } else {
       print("some error");
     }
@@ -28,19 +44,21 @@ class _CreateBookingState extends State<CreateBooking> {
         child: CupertinoDatePicker(
           onDateTimeChanged: (val) {
             // _expectedTime.text = TimeOfDay.fromDateTime(val).format(context);
-            changedVal = val;
+            arrivalTime = val;
             _expectedTime.text =
-                DateFormat('hh:mm a,  dd-MM-yyyy').format(changedVal);
+                DateFormat('hh:mm a,  dd-MM-yyyy').format(arrivalTime);
           },
-          initialDateTime: changedVal,
+          initialDateTime: arrivalTime,
           mode: CupertinoDatePickerMode.dateAndTime,
+          minuteInterval: 10,
         ),
       );
 
-  static void showSheet(
-          {required BuildContext context,
-          required Widget child,
-          required VoidCallback onClicked}) =>
+  static void showSheet({
+    required BuildContext context,
+    required Widget child,
+    required VoidCallback onClicked,
+  }) =>
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
@@ -49,10 +67,27 @@ class _CreateBookingState extends State<CreateBooking> {
           ],
           cancelButton: CupertinoActionSheetAction(
             onPressed: onClicked,
-            child: const Text("Done"),
+            child: const Text(
+              "Done",
+            ),
           ),
         ),
       );
+
+  @override
+  void dispose() {
+    _travelPurpose.dispose();
+    _dateinput.dispose();
+    _selectedTime.dispose();
+    _expectedTime.dispose();
+    _additionalInput.dispose();
+    super.dispose();
+  }
+
+  Future<String> fetchPosts() async {
+    final reponse = await http.get(Uri.parse('http://localhost:5000/'));
+    return reponse.body;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +101,16 @@ class _CreateBookingState extends State<CreateBooking> {
             key: _createBookingKey,
             child: Column(
               children: [
+                ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        print(fetchPosts());
+                      });
+                    },
+                    child: Text("btn")),
                 TextFormField(
                   maxLength: 50,
+                  controller: _travelPurpose,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Travel Purpose cannot be empty";
@@ -129,7 +172,16 @@ class _CreateBookingState extends State<CreateBooking> {
                     );
                     if (pickedTime != null) {
                       setState(() {
-                        _selectedTime.text = pickedTime.format(context);
+                        // _selectedTime.text = pickedTime.format(context);
+                        var now = DateTime.now();
+                        _selectedTime.text =
+                            DateFormat('hh:mm').format(DateTime(
+                          now.year,
+                          now.month,
+                          now.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        ));
                       });
                     }
                   },
@@ -147,26 +199,34 @@ class _CreateBookingState extends State<CreateBooking> {
                   controller: _expectedTime,
                   readOnly: true,
                   decoration: const InputDecoration(
-                      icon: Icon(
-                        Icons.time_to_leave,
-                        // CupertinoIcons.timer_fill,
-                        // Icons.more_time,
-                        color: Colors.blue,
-                      ),
-                      labelText: "Expected Date & time of arrival",
-                      hintText: "Time(hh:mm) Date(dd-mm-yyyy)"),
+                    icon: Icon(
+                      Icons.time_to_leave,
+                      // CupertinoIcons.timer_fill,
+                      // Icons.more_time,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Expected Date & time of arrival",
+                    hintText: "Time(hh:mm) Date(dd-mm-yyyy)",
+                  ),
                   onTap: () => showSheet(
                     context: context,
                     child: cupertinomaker(),
                     onClicked: () {
-                      _expectedTime.text =
-                          DateFormat('hh:mm a,  dd-MM-yyyy').format(changedVal);
+                      _expectedTime.text = DateFormat('hh:mm a,  dd-MM-yyyy')
+                          .format(arrivalTime);
                       Navigator.pop(context);
                     },
                   ),
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Arrival time cannot be empty";
+                    }
+                    return null;
+                  },
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _additionalInput,
+                  decoration: const InputDecoration(
                     label: Text("Additional Information"),
                     hintText: "Optional",
                   ),
