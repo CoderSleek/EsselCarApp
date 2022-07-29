@@ -15,6 +15,7 @@ class _CreateBookingState extends State<CreateBooking> {
   final TextEditingController _selectedTime = TextEditingController();
   final TextEditingController _expectedTime = TextEditingController();
   final TextEditingController _additionalInput = TextEditingController();
+  final TextEditingController _textShow = TextEditingController();
 
   static DateTime arrivalTime = DateTime(
     DateTime.now().year,
@@ -85,8 +86,8 @@ class _CreateBookingState extends State<CreateBooking> {
   }
 
   Future<String> fetchPosts() async {
-    final reponse = await http.get(Uri.parse('http://localhost:5000/'));
-    return reponse.body;
+    final response = await http.get(Uri.parse('http://10.0.3.2:5000/'));
+    return response.body;
   }
 
   @override
@@ -101,10 +102,13 @@ class _CreateBookingState extends State<CreateBooking> {
             key: _createBookingKey,
             child: Column(
               children: [
+                Text(_textShow.text),
                 ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        print(fetchPosts());
+                        fetchPosts().then((value) {
+                          _textShow.text = value;
+                        });
                       });
                     },
                     child: Text("btn")),

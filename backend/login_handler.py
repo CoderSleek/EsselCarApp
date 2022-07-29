@@ -38,12 +38,13 @@ class db_handler:
         write_json_data['mngmail'],
         )
 
+
     def read(self, read_json_data : dict) -> bool:
         cursor = self.db_conn.cursor()
         rows = cursor.execute(self._create_read_query(read_json_data))
-        for row in rows:
-            print(row)
-        return True
+        # for row in rows:
+        #     print(row)
+        return rows
 
 
     def write(self, write_json_data : dict) -> bool:
@@ -53,22 +54,21 @@ class db_handler:
         return True
 
 
+# def main():
+#     new_connection = db_handler()
+#     example_json = {
+#         'info': None,
+#         'condition': None,
+#     }
+#     example_json2 = {
+#         'name' : "'x'",
+#         'email' : "'y@z.com'",
+#         'loc': "'rkl'",
+#         'mngid': "'11'",
+#         'mngmail': "'11@z.com'",
+#     }
+#     new_connection.write(example_json2)
+#     new_connection.read(example_json)
 
-def main():
-    new_connection = db_handler()
-    example_json = {
-        'info': None,
-        'condition': None,
-    }
-    example_json2 = {
-        'name' : "'x'",
-        'email' : "'y@z.com'",
-        'loc': "'rkl'",
-        'mngid': "'11'",
-        'mngmail': "'11@z.com'",
-    }
-    new_connection.write(example_json2)
-    new_connection.read(example_json)
-
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
