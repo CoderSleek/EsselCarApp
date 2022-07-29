@@ -12,6 +12,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   static const String appVersion = "1.0.0";
+  static const String backendIP = "https://10.0.3.2:5000";
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(brightness: Brightness.dark),
         themeMode: ThemeMode.light,
         routes: {
-          "/": (context) => CreateBooking(),
+          "/": (context) => LoginPage(),
           MyRoutes.loginRoute: (context) => LoginPage(),
           MyRoutes.startRoute: (context) => StartPage(),
           MyRoutes.createBooking: (context) => CreateBooking(),

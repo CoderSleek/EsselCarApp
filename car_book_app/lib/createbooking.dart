@@ -15,7 +15,7 @@ class _CreateBookingState extends State<CreateBooking> {
   final TextEditingController _selectedTime = TextEditingController();
   final TextEditingController _expectedTime = TextEditingController();
   final TextEditingController _additionalInput = TextEditingController();
-  final TextEditingController _textShow = TextEditingController();
+  // final TextEditingController _textShow = TextEditingController();
 
   static DateTime arrivalTime = DateTime(
     DateTime.now().year,
@@ -102,16 +102,15 @@ class _CreateBookingState extends State<CreateBooking> {
             key: _createBookingKey,
             child: Column(
               children: [
-                Text(_textShow.text),
-                ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        fetchPosts().then((value) {
-                          _textShow.text = value;
-                        });
-                      });
-                    },
-                    child: Text("btn")),
+                // Text(_textShow.text),
+                // ElevatedButton(
+                //     onPressed: () async {
+                //       String x = await fetchPosts();
+                //       setState(() {
+                //         _textShow.text = x;
+                //       });
+                //     },
+                //     child: Text("btn")),
                 TextFormField(
                   maxLength: 50,
                   controller: _travelPurpose,

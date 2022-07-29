@@ -1,12 +1,15 @@
+// import 'dart:html';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
-  static String uid = "";
-  static String _pas = "";
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -14,6 +17,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _isvalid = RegExp(r'^[a-zA-Z0-9]+$');
 
+  final TextEditingController _uid = TextEditingController();
+  final TextEditingController _pas = TextEditingController();
   bool changeButton =
       false; //use for both changestate and next page load if info valid
 
@@ -35,6 +40,30 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateLogin() async {
     if (_loginFormKey.currentState!.validate()) {
+      // Uri uri = Uri.parse(MyApp.backendIP + '/login');
+      var uri = Uri.http('10.0.3.2:5000', '/login');
+      // var body;
+      try {
+        // print(_uid.text);
+        // body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
+        // body = jsonEncode({'uid': _uid.text, 'password': _pas.text});
+
+        // print(body);
+      } catch (err) {
+        Fluttertoast.showToast(
+          msg: "User Id Must only be numbers",
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+        );
+        return;
+      }
+      http.Response response = await http.post(
+        uri,
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode({"uid": "2", "password": "12345"}),
+      );
+      // print(response);
       setState(() {
         changeButton = true;
       });
@@ -85,25 +114,27 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     TextFormField(
+                      controller: _uid,
                       maxLength: 30,
                       decoration: const InputDecoration(
                         hintText: "Enter Employee ID",
                         labelText: "User ID",
                       ),
                       validator: (value) {
-                        LoginPage.uid = value.toString();
+                        // LoginPage.uid = value.toString();
                         return validateInputs(value, "ID", 0);
                       },
                     ),
                     TextFormField(
                       maxLength: 30,
+                      controller: _pas,
                       decoration: const InputDecoration(
                         hintText: "Enter Employee password",
                         labelText: "Password",
                       ),
                       obscureText: true,
                       validator: (value) {
-                        LoginPage._pas = value.toString();
+                        // LoginPage._pas = value.toString();
                         return validateInputs(value, "Password", 6);
                       },
                     ),

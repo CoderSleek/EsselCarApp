@@ -26,10 +26,12 @@ class MyDrawer extends StatelessWidget {
                 ),
                 // margin: EdgeInsets.zero,
                 accountName: Text(
-                  LoginPage.uid,
+                  // LoginPage.uid,
+                  "a",
                 ),
                 accountEmail: Text(
-                  "${LoginPage.uid}@gmail.com",
+                  // "${LoginPage.uid}@gmail.com",
+                  "a",
                 ),
               ),
             ),
