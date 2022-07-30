@@ -1,5 +1,5 @@
 import pyodbc
-
+import asyncio
 
 class db_handler:
     def __init__(self):
@@ -9,7 +9,7 @@ class db_handler:
         "Database=VehicleAPP;"
         "Trusted_Connection=yes;"
         )
-        self.read_query_template = 'SELECT {0} FROM emp_details WHERE {1};'
+        self.read_query_template = """SELECT * FROM emp_details WHERE emp_id=?;"""
         self.write_query_template = 'INSERT INTO emp_details VALUES({0},{1},{2},{3},{4});'
         self.ALL = '*'
         self.NONE =  '1=1'
@@ -39,12 +39,12 @@ class db_handler:
         )
 
 
-    def read(self, read_json_data : dict) -> bool:
+    def read(self, uid : int, columns = "emp_id") -> bool:
         cursor = self.db_conn.cursor()
-        rows = cursor.execute(self._create_read_query(read_json_data))
-        # for row in rows:
-        #     print(row)
-        return rows
+        row = cursor.execute(self.read_query_template, uid).fetchone() #execute returns a generator for all the sql rows returned
+        #fetchone returns the first sql row
+        #in this case uid is unique so the database will always return one row
+        return row
 
 
     def write(self, write_json_data : dict) -> bool:
@@ -52,23 +52,3 @@ class db_handler:
         cursor.execute(self._create_write_query(write_json_data))
         
         return True
-
-
-# def main():
-#     new_connection = db_handler()
-#     example_json = {
-#         'info': None,
-#         'condition': None,
-#     }
-#     example_json2 = {
-#         'name' : "'x'",
-#         'email' : "'y@z.com'",
-#         'loc': "'rkl'",
-#         'mngid': "'11'",
-#         'mngmail': "'11@z.com'",
-#     }
-#     new_connection.write(example_json2)
-#     new_connection.read(example_json)
-
-# if __name__ == '__main__':
-#     main()

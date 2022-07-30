@@ -40,37 +40,48 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateLogin() async {
     if (_loginFormKey.currentState!.validate()) {
-      // Uri uri = Uri.parse(MyApp.backendIP + '/login');
-      var uri = Uri.http('10.0.3.2:5000', '/login');
-      // var body;
-      try {
-        // print(_uid.text);
-        // body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
-        // body = jsonEncode({'uid': _uid.text, 'password': _pas.text});
-
-        // print(body);
-      } catch (err) {
-        Fluttertoast.showToast(
-          msg: "User Id Must only be numbers",
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-        );
-        return;
+      if (await sendLoginRequest(Uri.http(MyApp.backendIP, '/login'))) {
+        setState(() {
+          changeButton = true;
+        });
+        await Future.delayed(const Duration(milliseconds: 500));
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacementNamed(context, MyRoutes.startRoute);
       }
+    }
+  }
+
+  Future<bool> sendLoginRequest(Uri uri) async {
+    Map body;
+    try {
+      body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
+    } catch (err) {
+      Fluttertoast.showToast(
+        msg: "User Id Must only be numbers",
+        gravity: ToastGravity.CENTER,
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+      );
+      return false;
+    }
+
+    try {
       http.Response response = await http.post(
         uri,
         headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode({"uid": "2", "password": "12345"}),
+        body: jsonEncode(body),
       );
-      // print(response);
-      setState(() {
-        changeButton = true;
-      });
-      await Future.delayed(const Duration(milliseconds: 500));
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, MyRoutes.startRoute);
+
+      if (response.statusCode == 200) {
+        MyApp.userInfo = jsonDecode(response.body);
+        return true;
+      } else {
+        Fluttertoast.showToast(msg: response.body.toString());
+      }
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Connectivity Error");
     }
+    return false;
   }
 
   String? validateInputs(String? value, String item, int numOfChars) {

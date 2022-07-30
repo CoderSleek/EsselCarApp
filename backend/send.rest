@@ -1,4 +1,4 @@
-GET https://localhost:5000/
+GET http://localhost:5000/
 
 ###
 
@@ -6,6 +6,6 @@ POST http://localhost:5000/login
 Content-Type: application/json
 
 {
-    "uid": "1",
-    "password":"12345"
+    "uid": 1,
+    "password": "123456"
 }

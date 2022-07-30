@@ -1,5 +1,5 @@
 # from flask import Flask
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
@@ -20,17 +20,31 @@ def route():
 
 
 @app.post('/login')
-def home(req: LoginRequest):
-    # db = db_emp_det()
-    # rows = db.read(read_json_data)
-    print(req)
-    return "ok"
-    # db_new = db()
-    # rows = db_new.read({'info' : None, 'condition' : None})
-    # print(json.dumps([str(i) for i in rows]))
-    # return ''.join(str(i) for i in rows)
+def home(req: LoginRequest, response : Response):
+    try:
+        db = db_emp_det()
+        row = db.read(req.uid) # gets a single row as a named tuple from db
+        if row is None:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return "User Does not exist"
+
+        if req.password == row.password:
+            return {
+                'id': row.emp_id,
+                'name': row.emp_name,
+                'email': row.emp_email,
+                'mng_email' : row.mng_email
+            }
+        else:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return "Invalid Credentials"
+    except err:
+        # response.status_code = status.HTTP_400_BAD_REQUEST
+        print(err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return "Internal Server Error"
 
 
 if __name__ == '__main__':
     run(app, port=5000)
-    # home()
+    # print(home({'uid': 1, 'password': '123456'} , None))

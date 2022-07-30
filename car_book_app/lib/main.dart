@@ -12,7 +12,9 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   static const String appVersion = "1.0.0";
-  static const String backendIP = "https://10.0.3.2:5000";
+  static const String backendIP = "10.0.3.2:5000";
+  static late Map userInfo;
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
