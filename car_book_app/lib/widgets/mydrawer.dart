@@ -25,14 +25,8 @@ class MyDrawer extends StatelessWidget {
                   size: 80,
                 ),
                 // margin: EdgeInsets.zero,
-                accountName: Text(
-                  // LoginPage.uid,
-                  "a",
-                ),
-                accountEmail: Text(
-                  // "${LoginPage.uid}@gmail.com",
-                  "a",
-                ),
+                accountName: Text(MyApp.userInfo['name']),
+                accountEmail: Text(MyApp.userInfo['email']),
               ),
             ),
             ListTile(

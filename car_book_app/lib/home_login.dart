@@ -15,10 +15,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _isvalid = RegExp(r'^[a-zA-Z0-9]+$');
+  final RegExp _isvalid = RegExp(r'^[a-zA-Z0-9]+$');
 
   final TextEditingController _uid = TextEditingController();
   final TextEditingController _pas = TextEditingController();
+
   bool changeButton =
       false; //use for both changestate and next page load if info valid
 
@@ -52,45 +53,47 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> sendLoginRequest(Uri uri) async {
-    Map body;
-    try {
-      body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
-    } catch (err) {
-      Fluttertoast.showToast(
-        msg: "User Id Must only be numbers",
-        gravity: ToastGravity.CENTER,
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-      );
-      return false;
-    }
+    // Map body = {'uid': _uid.text, 'password': _pas.text};
+    // try {
+    //   body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
+    // } catch (err) {
+    //   Fluttertoast.showToast(
+    //     msg: "User Id Must only be numbers",
+    //     gravity: ToastGravity.CENTER,
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     timeInSecForIosWeb: 1,
+    //   );
+    //   return false;
+    // }
 
-    try {
-      http.Response response = await http.post(
-        uri,
-        headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
+    // try {
+    // http.Response response = await http.post(
+    //   uri,
+    //   headers: <String, String>{'Content-Type': 'application/json'},
+    //   body: jsonEncode(body),
+    // );
 
-      if (response.statusCode == 200) {
-        MyApp.userInfo = jsonDecode(response.body);
-        return true;
-      } else {
-        Fluttertoast.showToast(msg: response.body.toString());
-      }
-    } catch (err) {
-      Fluttertoast.showToast(msg: "Connectivity Error");
-    }
-    return false;
+    // if (response.statusCode == 200) {
+    //   MyApp.userInfo = jsonDecode(response.body);
+    return true;
+    // } else {
+    // Fluttertoast.showToast(msg: response.body.toString());
+    // }
+    // } catch (err) {
+    //   Fluttertoast.showToast(msg: "Connectivity Error");
+    // }
+    // return false;
   }
 
-  String? validateInputs(String? value, String item, int numOfChars) {
+  String? validateInputs(
+      String? value, String item, String errorMsg, RegExp exp,
+      {int numOfChars = 0}) {
     if (value!.isEmpty) {
       return "$item must not be empty";
     } else if (value.length < numOfChars) {
       return "$item cannot be less than $numOfChars charachter";
-    } else if (!_isvalid.hasMatch(value)) {
-      return "$item cannot contain special charachters";
+    } else if (!exp.hasMatch(value)) {
+      return "$item cannot contain $errorMsg";
     }
     return null;
   }
@@ -132,8 +135,9 @@ class _LoginPageState extends State<LoginPage> {
                         labelText: "User ID",
                       ),
                       validator: (value) {
-                        // LoginPage.uid = value.toString();
-                        return validateInputs(value, "ID", 0);
+                        final RegExp isvaliduid = RegExp(r'^[0-9]+$');
+                        return validateInputs(
+                            value, "ID", "non numeric charachter", isvaliduid);
                       },
                     ),
                     TextFormField(
@@ -145,8 +149,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       obscureText: true,
                       validator: (value) {
-                        // LoginPage._pas = value.toString();
-                        return validateInputs(value, "Password", 6);
+                        return validateInputs(
+                            value, "Password", "special charachters", _isvalid,
+                            numOfChars: 6);
                       },
                     ),
                   ],
