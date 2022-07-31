@@ -1,3 +1,4 @@
+import 'package:car_book_app/main.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,16 +29,19 @@ class _CreateBookingState extends State<CreateBooking> {
   final _createBookingKey = GlobalKey<FormState>();
   void validateBookingInformation() {
     if (_createBookingKey.currentState!.validate()) {
-      var json = {
+      Map body = {
+        'uid': MyApp.userInfo['uid'],
         'travelPurpose': _travelPurpose.text,
         'pickUpTimeDate': "${_selectedTime.text},  ${_dateinput.text}",
         'arrivalTimeDate': _expectedTime.text,
         'additionalInfo': _additionalInput.text,
       };
-      print(json);
-    } else {
-      print("some error");
+      sendCreateBookingRequest(body);
     }
+  }
+
+  void sendCreateBookingRequest(Map body) {
+    http.post(Uri.http(MyApp.backendIP, '/newbooking'));
   }
 
   Widget cupertinomaker() => SizedBox(

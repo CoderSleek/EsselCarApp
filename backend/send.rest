@@ -9,3 +9,16 @@ Content-Type: application/json
     "uid": 1,
     "password": "123456"
 }
+
+###
+
+POST http://localhost:5000/newbooking
+Content-Type: application/json
+
+{
+    "uid": 1,
+    "travelPurpose": "Man kiya",
+    "pickUpTimeDate": "11:00 AM,  27-07-2022",
+    "arrivalTimeDate": "11:00 PM,  27-07-2022",
+    "additionalInfo": null
+}

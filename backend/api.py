@@ -6,10 +6,19 @@ from typing import Optional
 
 from login_handler import db_handler as db_emp_det
 import json
+from datetime import datetime, date
 
 class LoginRequest(BaseModel):
     uid: int
     password: str
+
+
+class NewBooking(BaseModel):
+    uid: int
+    travelPurpose: str
+    pickUpTimeDate: str
+    arrivalTimeDate: str
+    additionalInfo: Optional[str | None]
 
 
 app = FastAPI()
@@ -45,6 +54,12 @@ def home(req: LoginRequest, response : Response):
         return "Internal Server Error"
 
 
+@app.post('/newbooking')
+def newbooking(req: NewBooking):
+    print(req)
+
+
 if __name__ == '__main__':
+    # print(datetime.now(), date.today())
     run(app, port=5000)
     # print(home({'uid': 1, 'password': '123456'} , None))
