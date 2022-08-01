@@ -19,9 +19,9 @@ Content-Type: application/json
     "uid": 1,
     "travelPurpose": "bizness",
     "expectedDistance": 3,
-    "pickUpTimeDate": "08:00 PM,  21-11-2022",
+    "pickupDateTime": "08:00 PM,  21-11-2022",
     "pickupVenue": "office",
-    "arrivalTimeDate": "01:00 PM,  21-11-2022",
+    "arrivalDateTime": "01:00 PM,  21-11-2022",
     "additionalInfo": null,
     "reqDateTime": "2022-07-31 15:42:10.662450"
 }

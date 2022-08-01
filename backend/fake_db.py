@@ -1,38 +1,27 @@
-class Item:
-    def __init__(self, ids, pas):
-        self.uid = ids
-        self.password = pas
-
-    def __repr__(self):
-        return "(uid: {0}, password: {1})".format(self.uid, self.password)
-            
-
 class emp_item:
-    def __init__(self, uid, name, email, mng_email):
-        self.uid = uid
-        self.name = name
-        self.email = email
+    def __init__(self, uid, pas, name, email, mng_email):
+        self.emp_id = uid
+        self.emp_name = name
+        self.password = pas
+        self.emp_email = email
         self.mng_email = mng_email
 
     def __repr__(self):
-        return f"(uid: {self.uid}, password: {self.name}, email: {self.email}, mng: {self.mng_email})"
+        return f"{self.emp_id} {self.emp_name} {self.password} {self.emp_email} {self.mng_email}"
 
 
 class db_emp_det:
     
     def __init__(self):
         self.items = []
-        self.items.append(Item(1, '123456'))
-        self.items.append(Item(2, '567890'))
-        print([i for i in self.items])
-
-        self.items_det = []
-        self.items_det.append(emp_item(1, 'dev', 'dn@gmail.com', 'dn1@gm.com'))
-        self.items_det.append(emp_item(2, 'test', 'test@gmail.com', 'test@gm.com'))
+        self.items.append(emp_item(1, '123456', 'dev', 'dn@gmail.com', 'dn1@gm.com'))
+        self.items.append(emp_item(2, '567890', 'test', 'test@gmail.com', 'test@gm.com'))
+        for item in self.items:
+            print(item)
 
 
     def read(self, uid):
-        [var,] = [i for i in self.items_det if i.uid == uid]
+        [var,] = [i for i in self.items if i.emp_id == uid]
         print(var)
         return var
 
@@ -70,6 +59,39 @@ class db_book_inf:
         for item in self.items:
             print(item)
 
-new = db_emp_det()
-new = db_book_inf()
-# new.read(1)
+
+    def write(self, req):
+        item = book_item(int(req.uid), req.travelPurpose, req.expectedDistance, req.pickupDateTime,
+        req.pickupVenue, req.arrivalDateTime, req.additionalInfo, req.reqDateTime)
+
+        self.items.append(item)
+        for item in self.items:
+            print(item)
+
+
+    def set_approval_status(self, val, bid):
+        for item in self.items:
+            if item.bid == bid:
+                item.approval_status = val
+
+        for item in self.items:
+            print(item)
+
+
+    def read(self, eid):
+        x = []
+        for item in self.items:
+            print(item)
+            if item.emp_id == eid:
+                x.append(item)
+
+        return x
+
+new1 = db_emp_det()
+new2 = db_book_inf()
+
+def db_emp_det():
+    return new1
+
+def db_book_inf():
+    return new2

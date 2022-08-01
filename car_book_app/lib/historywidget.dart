@@ -10,9 +10,9 @@ class HistoryData {
   final int uid;
   final String travelPurpose;
   final String expectedDistance;
-  final String pickUpTimeDate;
+  final String pickupDateTime;
   final String pickupVenue;
-  final String arrivalTimeDate;
+  final String arrivalDateTime;
   final String? additionalInfo;
   final bool isApproved;
 
@@ -20,21 +20,21 @@ class HistoryData {
     this.uid,
     this.travelPurpose,
     this.expectedDistance,
-    this.pickUpTimeDate,
+    this.pickupDateTime,
     this.pickupVenue,
-    this.arrivalTimeDate,
+    this.arrivalDateTime,
     this.additionalInfo,
     this.isApproved,
   );
 }
 
 class HistoryWidget extends StatelessWidget {
-  // final HistoryData data;
+  final HistoryData data;
 
-  // const HistoryWidget({required Key key, required this.data})
-  //     : assert(data != null),
-  //       super(key: key);
-
+  const HistoryWidget({required Key key, required this.data})
+      : assert(data != null),
+        super(key: key);
+  static List<dynamic> histories = [];
   static void getHistory() async {
     try {
       http.Response res = await http
@@ -51,8 +51,21 @@ class HistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     getHistory();
-    return Material();
+    return Material(
+      child: Row(
+        children: [
+          Text("uid = ${histories[0]['uid']}"),
+          Text("travelPurpose = ${histories[0]['travelPurpose']}"),
+          Text("expectedDistance = ${histories[0]['expectedDistance']}"),
+          Text("pickupDateTime = ${histories[0]['pickupDateTime']}"),
+          Text("pickupVenue = ${histories[0]['pickupVenue']}"),
+          Text("arrivalDateTime = ${histories[0]['arrivalDateTime']}"),
+          Text("additionalInfo = ${histories[0]['additionalInfo']}"),
+          Text("isApproved = ${histories[0]['isApproved']}"),
+        ],
+      ),
+    );
   }
 }
 
-List<dynamic> histories = [];
+// List<dynamic> histories = [];

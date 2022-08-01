@@ -4,8 +4,10 @@ from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
 
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+
+from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -20,7 +22,7 @@ class NewBooking(BaseModel):
     uid: int
     travelPurpose: str
     expectedDistance: float
-    pickUpTimeDate: str
+    pickupDateTime: str
     pickupVenue: str
     arrivalDateTime: str
     additionalInfo: Optional[str | None]
@@ -65,8 +67,8 @@ def newbooking(req: NewBooking):
     # x.reverse()
     # x = ' '.join(x)
     regex = '^(\d\d:\d\d [A|P]M).+(\d\d)-(\d\d)-([\d]+)'
-    temp = re.findall(regex, req.pickUpTimeDate)
-    req.pickUpTimeDate = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
+    temp = re.findall(regex, req.pickupDateTime)
+    req.pickupDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
     temp = re.findall(regex, req.arrivalDateTime)
     req.arrivalDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
@@ -107,7 +109,7 @@ def history(uid : int) -> list:
             data = {'uid' : row.emp_id,
             'travelPurpose': row.trav_purpose,
             'expectedDistance': row.expected_dist,
-            'pickUpTimeDate': str(row.pickup_date_time),
+            'pickUpDateTime': str(row.pickup_date_time),
             'pickupVenue': row.pickup_venue,
             'arrivalDateTime': str(row.arrival_date_time),
             'additionalInfo': row.additional_info,
@@ -116,8 +118,8 @@ def history(uid : int) -> list:
 
         return json_list
     except:
-        # response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        # return "Internal Server Error"
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return "Internal Server Error"
         pass
 
 if __name__ == '__main__':

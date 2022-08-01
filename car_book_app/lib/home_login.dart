@@ -71,16 +71,16 @@ class _LoginPageState extends State<LoginPage> {
     // }
 
     try {
-      // http.Response response = await http.post(
-      //   uri,
-      //   headers: <String, String>{'Content-Type': 'application/json'},
-      //   body: jsonEncode(body),
-      // );
-      final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode({'uid': 1, 'password': '123456'}));
+      http.Response response = await http.post(
+        uri,
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+      // final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
+      //     headers: <String, String>{
+      //       'Content-Type': 'application/json; charset=UTF-8',
+      //     },
+      //     body: jsonEncode({'uid': 1, 'password': '123456'}));
       // print(response.body);
       if (response.statusCode == 200) {
         MyApp.userInfo = jsonDecode(response.body);
