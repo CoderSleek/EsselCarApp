@@ -7,6 +7,7 @@ import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
@@ -15,8 +16,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final RegExp _isvalid = RegExp(r'^[a-zA-Z0-9]+$');
-
   final TextEditingController _uid = TextEditingController();
   final TextEditingController _pas = TextEditingController();
 
@@ -45,6 +44,11 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           changeButton = true;
         });
+        // MyApp.userInfo = {
+        //   'uid': 1,
+        //   'name': 'Dev Narula',
+        //   'email': '@gmail.com'
+        // };
         await Future.delayed(const Duration(milliseconds: 500));
         // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, MyRoutes.startRoute);
@@ -53,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> sendLoginRequest(Uri uri) async {
-    // Map body = {'uid': _uid.text, 'password': _pas.text};
+    Map body = {'uid': _uid.text, 'password': _pas.text};
     // try {
     //   body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
     // } catch (err) {
@@ -66,23 +70,23 @@ class _LoginPageState extends State<LoginPage> {
     //   return false;
     // }
 
-    // try {
-    // http.Response response = await http.post(
-    //   uri,
-    //   headers: <String, String>{'Content-Type': 'application/json'},
-    //   body: jsonEncode(body),
-    // );
+    try {
+      http.Response response = await http.post(
+        uri,
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
 
-    // if (response.statusCode == 200) {
-    //   MyApp.userInfo = jsonDecode(response.body);
-    return true;
-    // } else {
-    // Fluttertoast.showToast(msg: response.body.toString());
-    // }
-    // } catch (err) {
-    //   Fluttertoast.showToast(msg: "Connectivity Error");
-    // }
-    // return false;
+      if (response.statusCode == 200) {
+        MyApp.userInfo = jsonDecode(response.body);
+        return true;
+      } else {
+        Fluttertoast.showToast(msg: jsonDecode(response.body));
+      }
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Connectivity Error");
+    }
+    return false;
   }
 
   String? validateInputs(
@@ -109,83 +113,124 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
+          style: TextStyle(
+            fontFamily: GoogleFonts.courgette().fontFamily,
+            fontSize: 24,
+            letterSpacing: 0.3,
+            wordSpacing: 0.3,
+          ),
           "Car Booking App",
         ),
         // backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Text(
-              "Welcome",
-              style: TextStyle(
-                fontSize: 40,
-                fontFamily: "Sans",
-                color: Colors.blue,
-                // fontFamilyFallback: ["Times new Roman"],
+      body: Container(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 12,
               ),
-              softWrap: false,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-              child: Form(
-                key: _loginFormKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _uid,
-                      maxLength: 30,
-                      decoration: const InputDecoration(
-                        hintText: "Enter Employee ID",
-                        labelText: "User ID",
+              Image.asset(
+                'assets/login.png',
+                height: 130,
+                // width: 300,
+                // fit: BoxFit.contain,
+              ),
+              Text(
+                "Welcome",
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 32,
+                  fontFamily: GoogleFonts.pacifico().fontFamily,
+                  // fontWeight: FontWeight.bold,
+                  // color: Colors.blue,
+                  // fontFamilyFallback: ["Times new Roman"],
+                ),
+                softWrap: false,
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                child: Form(
+                  key: _loginFormKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _uid,
+                        maxLength: 30,
+                        decoration: const InputDecoration(
+                          icon: Icon(
+                            Icons.person,
+                            // color: Color.fromRGBO(255, 111, 97, 1.00),
+                            color: Colors.blue,
+                          ),
+                          hintText: "Enter Employee ID",
+                          labelText: "User ID",
+                        ),
+                        validator: (value) {
+                          final RegExp isvaliduid = RegExp(r'^[0-9]+$');
+                          return validateInputs(value, "ID",
+                              "non numeric charachter", isvaliduid);
+                        },
                       ),
-                      validator: (value) {
-                        final RegExp isvaliduid = RegExp(r'^[0-9]+$');
-                        return validateInputs(
-                            value, "ID", "non numeric charachter", isvaliduid);
-                      },
-                    ),
-                    TextFormField(
-                      maxLength: 30,
-                      controller: _pas,
-                      decoration: const InputDecoration(
-                        hintText: "Enter Employee password",
-                        labelText: "Password",
+                      TextFormField(
+                        maxLength: 30,
+                        controller: _pas,
+                        decoration: const InputDecoration(
+                          icon: Icon(
+                            Icons.lock,
+                            color: Colors.blue,
+                          ),
+                          hintText: "Enter Employee password",
+                          labelText: "Password",
+                        ),
+                        obscureText: true,
+                        validator: (value) {
+                          RegExp isvalid = RegExp(r'^[a-zA-Z0-9\*\#\$\&]+$');
+                          return validateInputs(
+                              value, "Password", "special charachters", isvalid,
+                              numOfChars: 6);
+                        },
                       ),
-                      obscureText: true,
-                      validator: (value) {
-                        return validateInputs(
-                            value, "Password", "special charachters", _isvalid,
-                            numOfChars: 6);
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: validateLogin,
-              style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(140, 40),
-                  // primary: Colors.amber, text color
-                  // surfaceTintColor: Colors.yellow,
-                  shadowColor: const Color.fromRGBO(00, 44, 255, 1.0),
-                  // backgroundColor: Colors.black, btn clr 4 textbutton
-                  shape: changeButton
-                      ? const CircleBorder()
-                      : const StadiumBorder(),
-                  padding: changeButton
-                      ? const EdgeInsets.all(11)
-                      : const EdgeInsets.all(0),
-                  animationDuration: const Duration(milliseconds: 500)),
-              child:
-                  changeButton ? const Icon(Icons.done) : const Text("Login"),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: validateLogin,
+                style: ElevatedButton.styleFrom(
+                    textStyle: TextStyle(
+                      fontFamily: GoogleFonts.sora(fontWeight: FontWeight.w600)
+                          .fontFamily,
+                      // fontFamily: GoogleFonts.varelaRound().fontFamily,
+                      // fontFamily: GoogleFonts.mPlusRounded1c().fontFamily,
+                      // fontFamily: GoogleFonts.indieFlower().fontFamily,
+                      // fontWeight: FontWeight.w900,
+                      letterSpacing: 0.4,
+                    ),
+                    minimumSize: const Size(140, 40),
+                    // primary: Colors.amber, text color
+                    // surfaceTintColor: Colors.yellow,
+                    shadowColor: const Color.fromRGBO(00, 44, 255, 1.0),
+                    // backgroundColor: Colors.black, btn clr 4 textbutton
+                    shape: changeButton
+                        ? const CircleBorder()
+                        : const StadiumBorder(),
+                    padding: changeButton
+                        ? const EdgeInsets.all(11)
+                        : const EdgeInsets.all(0),
+                    animationDuration: const Duration(milliseconds: 500)),
+                child:
+                    changeButton ? const Icon(Icons.done) : const Text("Login"),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+// <a href="https://lovepik.com/images/png-computer.html">Computer Png vectors by Lovepik.com</a>

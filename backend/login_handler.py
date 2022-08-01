@@ -1,5 +1,4 @@
 import pyodbc
-import asyncio
 
 class db_handler:
     def __init__(self):
@@ -11,8 +10,6 @@ class db_handler:
         )
         self.read_query_template = """SELECT * FROM emp_details WHERE emp_id=?;"""
         self.write_query_template = 'INSERT INTO emp_details VALUES({0},{1},{2},{3},{4});'
-        self.ALL = '*'
-        self.NONE =  '1=1'
 
 
     def _create_read_query(self, read_json_data: dict) -> str:

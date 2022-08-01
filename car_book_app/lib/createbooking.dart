@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:car_book_app/home_login.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 
 class CreateBooking extends StatefulWidget {
   @override
@@ -16,7 +21,10 @@ class _CreateBookingState extends State<CreateBooking> {
   final TextEditingController _selectedTime = TextEditingController();
   final TextEditingController _expectedTime = TextEditingController();
   final TextEditingController _additionalInput = TextEditingController();
-  // final TextEditingController _textShow = TextEditingController();
+  final TextEditingController _pickupVenue = TextEditingController();
+  final TextEditingController _expectedDist = TextEditingController();
+
+  static final RegExp isValid = RegExp(r'^[a-zA-Z0-9 ]+$');
 
   static DateTime arrivalTime = DateTime(
     DateTime.now().year,
@@ -27,21 +35,42 @@ class _CreateBookingState extends State<CreateBooking> {
   );
 
   final _createBookingKey = GlobalKey<FormState>();
+
   void validateBookingInformation() {
     if (_createBookingKey.currentState!.validate()) {
       Map body = {
-        'uid': MyApp.userInfo['uid'],
-        'travelPurpose': _travelPurpose.text,
-        'pickUpTimeDate': "${_selectedTime.text},  ${_dateinput.text}",
-        'arrivalTimeDate': _expectedTime.text,
-        'additionalInfo': _additionalInput.text,
+        "uid": MyApp.userInfo['uid'],
+        "travelPurpose": _travelPurpose.text,
+        "expectedDistance": _expectedDist.text,
+        "pickUpTimeDate": "${_selectedTime.text},  ${_dateinput.text}",
+        "pickupVenue": _pickupVenue.text,
+        "arrivalTimeDate": _expectedTime.text,
+        "additionalInfo":
+            _additionalInput.text != '' ? _additionalInput.text : null,
+        "reqDateTime": DateTime.now().toString()
       };
       sendCreateBookingRequest(body);
     }
   }
 
-  void sendCreateBookingRequest(Map body) {
-    http.post(Uri.http(MyApp.backendIP, '/newbooking'));
+  void sendCreateBookingRequest(Map body) async {
+    try {
+      http.Response response = await http.post(
+          Uri.http(MyApp.backendIP, '/newbooking'),
+          headers: <String, String>{'Content-Type': 'application/json'},
+          body: jsonEncode(body));
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "Success", toastLength: Toast.LENGTH_SHORT);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Error Occured", toastLength: Toast.LENGTH_SHORT);
+      }
+      Navigator.pop(context);
+    } catch (err) {
+      Fluttertoast.showToast(
+          msg: "Connectivity Error", toastLength: Toast.LENGTH_SHORT);
+    }
   }
 
   Widget cupertinomaker() => SizedBox(
@@ -86,6 +115,8 @@ class _CreateBookingState extends State<CreateBooking> {
     _selectedTime.dispose();
     _expectedTime.dispose();
     _additionalInput.dispose();
+    _pickupVenue.dispose();
+    _expectedDist.dispose();
     super.dispose();
   }
 
@@ -97,7 +128,18 @@ class _CreateBookingState extends State<CreateBooking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(
+          style: TextStyle(
+            fontFamily: GoogleFonts.courgette().fontFamily,
+            fontSize: 24,
+            letterSpacing: 0.3,
+            wordSpacing: 0.3,
+          ),
+          "New Booking",
+        ),
+        centerTitle: true,
+      ),
       drawer: MyDrawer(),
       body: SingleChildScrollView(
         child: Padding(
@@ -121,12 +163,34 @@ class _CreateBookingState extends State<CreateBooking> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Travel Purpose cannot be empty";
+                    } else if (!(isValid.hasMatch(value))) {
+                      return "Purpose Cannot Contain Special Charachters";
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
                     hintText: "Purpose of Travel",
                     label: Text("Travel Purpose"),
+                  ),
+                ),
+                TextFormField(
+                  maxLength: 50,
+                  controller: _pickupVenue,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Pickup Venue Cannot be Empty";
+                    } else if (!(isValid.hasMatch(value))) {
+                      return "Venue Cannot contain Special Charachters";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.location_city,
+                      color: Colors.blue,
+                    ),
+                    hintText: "Address of pickup",
+                    labelText: "Pickup Venue",
                   ),
                 ),
                 TextFormField(
@@ -161,6 +225,7 @@ class _CreateBookingState extends State<CreateBooking> {
                       color: Colors.blue,
                     ),
                     labelText: "Pick-up Date",
+                    hintText: "dd-mm-yyyy",
                   ),
                 ),
                 TextFormField(
@@ -182,7 +247,7 @@ class _CreateBookingState extends State<CreateBooking> {
                         // _selectedTime.text = pickedTime.format(context);
                         var now = DateTime.now();
                         _selectedTime.text =
-                            DateFormat('hh:mm').format(DateTime(
+                            DateFormat('hh:mm a').format(DateTime(
                           now.year,
                           now.month,
                           now.day,
@@ -199,9 +264,9 @@ class _CreateBookingState extends State<CreateBooking> {
                       color: Colors.blue,
                     ),
                     labelText: "Pick-up Time",
+                    hintText: "hh:mm",
                   ),
                 ),
-                // const TextField(),
                 TextFormField(
                   controller: _expectedTime,
                   readOnly: true,
@@ -231,8 +296,35 @@ class _CreateBookingState extends State<CreateBooking> {
                     return null;
                   },
                 ),
-                TextField(
+                TextFormField(
+                  maxLength: 8,
+                  controller: _expectedDist,
+                  validator: (value) {
+                    RegExp isValid = RegExp(r'^\d+\.?\d*$');
+                    if (value == null || value.isEmpty) {
+                      return "Distance cannot be empty";
+                    } else if (!isValid.hasMatch(value)) {
+                      return "Can Only contain Numbers";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    icon: Icon(
+                      Icons.social_distance,
+                      color: Colors.blue,
+                    ),
+                    labelText: "Expected Distance",
+                    hintText: "Distance in KM (e.g. 123.55)",
+                  ),
+                ),
+                TextFormField(
                   controller: _additionalInput,
+                  validator: (value) {
+                    if (!(value!.contains(RegExp(r'^[a-zA-Z ]*$')))) {
+                      return "Can only contain alphabets";
+                    }
+                    return null;
+                  },
                   decoration: const InputDecoration(
                     label: Text("Additional Information"),
                     hintText: "Optional",

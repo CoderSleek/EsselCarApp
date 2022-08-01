@@ -37,7 +37,10 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
         // home: LoginPage(),
-        theme: ThemeData(primarySwatch: Colors.deepPurple),
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+          fontFamily: GoogleFonts.lato().fontFamily,
+        ),
         darkTheme: ThemeData(brightness: Brightness.dark),
         themeMode: ThemeMode.light,
         routes: {

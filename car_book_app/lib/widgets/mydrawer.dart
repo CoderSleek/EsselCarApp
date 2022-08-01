@@ -3,6 +3,7 @@ import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyDrawer extends StatelessWidget {
   @override
@@ -17,16 +18,36 @@ class MyDrawer extends StatelessWidget {
               padding: EdgeInsets.zero,
               margin: EdgeInsets.zero,
               child: UserAccountsDrawerHeader(
+                decoration: const BoxDecoration(color: Colors.deepPurple),
                 margin: EdgeInsets.zero,
                 currentAccountPictureSize:
-                    Size(MediaQuery.of(context).size.width * 0.75, 100),
+                    Size(MediaQuery.of(context).size.width * 0.70, 100),
+                // currentAccountPicture: Image.asset(
+                //   'assets/logo.png',
+                // ),
                 currentAccountPicture: const Icon(
-                  Icons.person,
+                  CupertinoIcons.person_crop_circle,
                   size: 80,
+                  color: Colors.white70,
                 ),
                 // margin: EdgeInsets.zero,
-                accountName: Text(MyApp.userInfo['name']),
-                accountEmail: Text(MyApp.userInfo['email']),
+                accountName: Text(
+                  MyApp.userInfo['name'],
+                  style: TextStyle(
+                    wordSpacing: 0.4,
+                    height: 0.8,
+                    letterSpacing: 0.3,
+                    fontFamily: GoogleFonts.nunito().fontFamily,
+                  ),
+                ),
+                accountEmail: Text(
+                  MyApp.userInfo['email'],
+                  style: TextStyle(
+                    height: 0.8,
+                    letterSpacing: 0.3,
+                    fontFamily: GoogleFonts.nunito().fontFamily,
+                  ),
+                ),
               ),
             ),
             ListTile(
@@ -36,28 +57,32 @@ class MyDrawer extends StatelessWidget {
               },
               leading: const Icon(Icons.logout_rounded),
               iconColor: Colors.white,
-              title: const Text(
+              title: Text(
                 "Logout",
                 textScaleFactor: 0.9,
                 overflow: TextOverflow.fade,
                 softWrap: false,
                 style: TextStyle(
                   color: Colors.white,
-                  letterSpacing: 1.3,
-                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.1,
+                  fontFamily: GoogleFonts.nunito(
+                    fontWeight: FontWeight.w600,
+                  ).fontFamily,
                 ),
               ),
             ),
-            const ListTile(
-              leading: Icon(CupertinoIcons.info),
+            ListTile(
+              leading: const Icon(CupertinoIcons.info),
               iconColor: Colors.white,
               title: Text(
                 "Version: ${MyApp.appVersion}",
                 textScaleFactor: 0.9,
                 style: TextStyle(
                   color: Colors.white,
-                  letterSpacing: 1.3,
-                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.1,
+                  fontFamily: GoogleFonts.nunito(
+                    fontWeight: FontWeight.w600,
+                  ).fontFamily,
                 ),
               ),
             )
@@ -67,3 +92,4 @@ class MyDrawer extends StatelessWidget {
     );
   }
 }
+// <a href='https://pngtree.com/so/User'>User png from pngtree.com/</a>

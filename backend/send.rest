@@ -17,8 +17,16 @@ Content-Type: application/json
 
 {
     "uid": 1,
-    "travelPurpose": "Man kiya",
-    "pickUpTimeDate": "11:00 AM,  27-07-2022",
-    "arrivalTimeDate": "11:00 PM,  27-07-2022",
-    "additionalInfo": null
+    "travelPurpose": "bizness",
+    "expectedDistance": 3,
+    "pickUpTimeDate": "08:00 PM,  21-11-2022",
+    "pickupVenue": "office",
+    "arrivalTimeDate": "01:00 PM,  21-11-2022",
+    "additionalInfo": null,
+    "reqDateTime": "2022-07-31 15:42:10.662450"
 }
+
+###
+
+GET http://localhost:5000/history/1
+# Content-Type: application/json
