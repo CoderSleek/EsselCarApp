@@ -22,12 +22,10 @@ class NewBooking(BaseModel):
     expectedDistance: float
     pickUpTimeDate: str
     pickupVenue: str
-    arrivalTimeDate: str
+    arrivalDateTime: str
     additionalInfo: Optional[str | None]
     reqDateTime: str
 
-class Base(BaseModel):
-    uid: int
 
 app = FastAPI()
 
@@ -70,8 +68,8 @@ def newbooking(req: NewBooking):
     temp = re.findall(regex, req.pickUpTimeDate)
     req.pickUpTimeDate = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
-    temp = re.findall(regex, req.arrivalTimeDate)
-    req.arrivalTimeDate = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
+    temp = re.findall(regex, req.arrivalDateTime)
+    req.arrivalDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
     temp = re.findall('^([\d]+-\d\d-\d\d).(\d\d:\d\d)', req.reqDateTime)
     req.reqDateTime = ' '.join(temp[0])
@@ -111,7 +109,7 @@ def history(uid : int) -> list:
             'expectedDistance': row.expected_dist,
             'pickUpTimeDate': str(row.pickup_date_time),
             'pickupVenue': row.pickup_venue,
-            'arrivalTimeDate': str(row.arrival_date_time),
+            'arrivalDateTime': str(row.arrival_date_time),
             'additionalInfo': row.additional_info,
             'approvalStatus': row.approval_status}
             json_list.append(data)

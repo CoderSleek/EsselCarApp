@@ -40,8 +40,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateLogin() async {
     if (_loginFormKey.currentState!.validate()) {
-      if (await sendLoginRequest(
-          Uri.http(MyApp.backendIP /*'127.0.0.1:5000'*/, '/login'))) {
+      if (await sendLoginRequest(Uri.http(MyApp.backendIP, '/login'))) {
         setState(() {
           changeButton = true;
         });
@@ -58,7 +57,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> sendLoginRequest(Uri uri) async {
-    // print(uri.toString());
     Map body = {'uid': _uid.text, 'password': _pas.text};
     // try {
     //   body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
@@ -78,12 +76,11 @@ class _LoginPageState extends State<LoginPage> {
       //   headers: <String, String>{'Content-Type': 'application/json'},
       //   body: jsonEncode(body),
       // );
-      final response = await http.post(
-        Uri.http('127.0.0.1:5000', '/login'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
+      final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode({'uid': 1, 'password': '123456'}));
       // print(response.body);
       if (response.statusCode == 200) {
         MyApp.userInfo = jsonDecode(response.body);
