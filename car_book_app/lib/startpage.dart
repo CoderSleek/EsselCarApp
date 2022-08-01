@@ -29,12 +29,14 @@ class _StartPageState extends State<StartPage> {
       body: Stack(
         children: [
           // ListView.builder(
-          //   itemCount: histories.length,
-          //   itemBuilder: (context, index) {
-          //     // return HistoryWidget(
-          //     //   data: histories[index],
-          //     // );
-          //   },
+          // itemCount: () =>{setState(() {
+
+          // });},
+          // itemBuilder: (context, index) {
+          // return HistoryWidget(
+          //   data: histories[index],
+          // );
+          // },
           // ),
           Align(
             alignment: FractionalOffset.bottomCenter,

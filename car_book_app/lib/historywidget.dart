@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:car_book_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class HistoryData {
@@ -36,11 +37,15 @@ class HistoryWidget extends StatelessWidget {
 
   static void getHistory() async {
     try {
-      print('sent response');
       http.Response res = await http
           .get(Uri.http(MyApp.backendIP, '/history/${MyApp.userInfo['uid']}'));
-      print(jsonDecode(res.body));
-    } catch (err) {}
+      histories = jsonDecode(res.body);
+    } catch (err) {
+      Fluttertoast.showToast(
+        msg: 'Connection Error',
+        toastLength: Toast.LENGTH_SHORT,
+      );
+    }
   }
 
   @override
@@ -50,4 +55,4 @@ class HistoryWidget extends StatelessWidget {
   }
 }
 
-var histories = [];
+List<dynamic> histories = [];
