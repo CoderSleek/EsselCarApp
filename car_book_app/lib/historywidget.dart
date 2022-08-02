@@ -34,7 +34,9 @@ class HistoryWidget extends StatelessWidget {
   const HistoryWidget({required Key key, required this.data})
       : assert(data != null),
         super(key: key);
+
   static List<dynamic> histories = [];
+
   static void getHistory() async {
     try {
       http.Response res = await http
@@ -51,20 +53,38 @@ class HistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     getHistory();
-    return Material(
-      child: Row(
+    return ListTile(
+      title: Row(
         children: [
-          Text("uid = ${histories[0]['uid']}"),
-          Text("travelPurpose = ${histories[0]['travelPurpose']}"),
-          Text("expectedDistance = ${histories[0]['expectedDistance']}"),
-          Text("pickupDateTime = ${histories[0]['pickupDateTime']}"),
-          Text("pickupVenue = ${histories[0]['pickupVenue']}"),
-          Text("arrivalDateTime = ${histories[0]['arrivalDateTime']}"),
-          Text("additionalInfo = ${histories[0]['additionalInfo']}"),
-          Text("isApproved = ${histories[0]['isApproved']}"),
+          Text(data.travelPurpose),
+          Text(
+            data.isApproved == null
+                ? "Not Approved"
+                : (data.isApproved == true ? "Accepted" : "Rejected"),
+          ),
+        ],
+      ),
+      subtitle: Row(
+        children: [
+          Text(data.expectedDistance),
+          Text(data.pickupDateTime),
+          Text(data.pickupVenue),
         ],
       ),
     );
+    //   child: Row(
+    //     children: [
+    //       Text("uid = ${histories[0]['uid']}"),
+    //       Text("travelPurpose = ${histories[0]['travelPurpose']}"),
+    //       Text("expectedDistance = ${histories[0]['expectedDistance']}"),
+    //       Text("pickupDateTime = ${histories[0]['pickupDateTime']}"),
+    //       Text("pickupVenue = ${histories[0]['pickupVenue']}"),
+    //       Text("arrivalDateTime = ${histories[0]['arrivalDateTime']}"),
+    //       Text("additionalInfo = ${histories[0]['additionalInfo']}"),
+    //       Text("isApproved = ${histories[0]['isApproved']}"),
+    //     ],
+    //   ),
+    // );
   }
 }
 
