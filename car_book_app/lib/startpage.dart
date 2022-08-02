@@ -28,14 +28,15 @@ class _StartPageState extends State<StartPage> {
       ),
       body: Stack(
         children: [
-          // ListView.builder(
-          //   itemCount: HistoryWidget.histories.length,
-          //   itemBuilder: (context, index) {
-          //     return HistoryWidget(
-          //       data: HistoryWidget.histories[index],
-          //     );
-          //   },
-          // ),
+          ListView.builder(
+            itemCount: HistoryWidget.histories.length,
+            itemBuilder: (context, index) {
+              return HistoryWidget(
+                data: HistoryWidget.histories[index],
+                key: Key("key"),
+              );
+            },
+          ),
           Align(
             alignment: FractionalOffset.bottomCenter,
             child: Padding(

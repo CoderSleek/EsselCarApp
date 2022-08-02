@@ -109,7 +109,7 @@ def history(uid : int) -> list:
             data = {'uid' : row.emp_id,
             'travelPurpose': row.trav_purpose,
             'expectedDistance': row.expected_dist,
-            'pickUpDateTime': str(row.pickup_date_time),
+            'pickupDateTime': str(row.pickup_date_time),
             'pickupVenue': row.pickup_venue,
             'arrivalDateTime': str(row.arrival_date_time),
             'additionalInfo': row.additional_info,

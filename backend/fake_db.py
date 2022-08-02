@@ -53,7 +53,7 @@ class db_book_inf:
         self.items = []
         self.items.append(book_item(1,'a', 2.82, '2022-08-31 15:00:00', 'a', '2022-08-31 16:00:00'
         ,None, '2022-08-31 13:00:00'))
-        self.items.append(book_item(1,'a', 2.82, '2022-08-31 15:00:00', 'a', '2022-08-31 16:00:00'
+        self.items.append(book_item(1,'b', 2.82, '2022-08-31 15:00:00', 'b', '2022-08-31 16:00:00'
         ,None, '2022-08-31 13:00:00'))
         
         for item in self.items:
