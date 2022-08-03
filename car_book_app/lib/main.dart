@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   static const String appVersion = "1.0.0";
   static const String backendIP = "10.0.3.2:5000";
-  static late Map userInfo = {'uid': 1, 'name': 'dev', 'email': 'dn@gm.com'};
+  static late Map userInfo;
 
   // This widget is the root of your application.
   @override
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(brightness: Brightness.dark),
         themeMode: ThemeMode.light,
         routes: {
-          "/": (context) => StartPage(),
+          "/": (context) => LoginPage(),
           MyRoutes.loginRoute: (context) => LoginPage(),
           MyRoutes.startRoute: (context) => StartPage(),
           MyRoutes.createBooking: (context) => CreateBooking(),

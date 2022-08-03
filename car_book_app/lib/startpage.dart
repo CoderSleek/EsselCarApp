@@ -12,8 +12,9 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
-    HistoryWidget.getHistory();
-    print(HistoryWidget.histories.length);
+    // print('before history ${HistoryWidget.histories.length}');
+    // HistoryWidget.getHistory();
+    // print('after history ${HistoryWidget.histories.length}');
 
     return Scaffold(
       appBar: AppBar(
@@ -30,13 +31,20 @@ class _StartPageState extends State<StartPage> {
       ),
       body: Stack(
         children: [
-          ListView.builder(
-            itemCount: HistoryWidget.histories.length,
-            itemBuilder: (context, index) {
-              return HistoryWidget(
-                data: HistoryWidget.histories[index],
-              );
-            },
+          FractionallySizedBox(
+            heightFactor: 0.8,
+            // color: Colors.white70,
+            // height: 30,
+            // constraints: BoxConstraints(minHeight: 100, maxHeight: 300),
+            // padding: EdgeInsets.only(top: 30),
+            child: ListView.builder(
+              itemCount: HistoryWidget.histories.length,
+              itemBuilder: (context, index) {
+                return HistoryWidget(
+                  data: HistoryWidget.histories[index],
+                );
+              },
+            ),
           ),
           Align(
             alignment: FractionalOffset.bottomCenter,

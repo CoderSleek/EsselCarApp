@@ -20,23 +20,35 @@ class HistoryData {
   HistoryData.fromJson(Map<String, dynamic> item) {
     uid = item['uid'];
     travelPurpose = item['travelPurpose'];
+    // travelPurpose =
+    // 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     expectedDistance = item['expectedDistance'];
-    pickupDateTime = item['pickupDateTime'];
     pickupVenue = item['pickupVenue'];
-    arrivalDateTime = item['arrivalDateTime'];
     additionalInfo = item['additionalInfo'];
     isApproved = item['approvalStatus'];
+
+    final RegExp dt = RegExp(r'^([\d]+)-(\d\d)-(\d\d).(\d\d):(\d\d)');
+    RegExpMatch? match = dt.firstMatch(item['pickupDateTime']);
+
+    pickupDateTime =
+        '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
+
+    match = dt.firstMatch(item['arrivalDateTime']);
+    arrivalDateTime =
+        '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
   }
 }
 
-class HistoryWidget extends StatelessWidget {
+class HistoryWidget extends StatefulWidget {
   static List<dynamic> histories = [];
 
   final HistoryData data;
+  final int index;
 
-  const HistoryWidget({required this.data});
+  const HistoryWidget({required this.data, this.index = 0});
 
   static void getHistory() async {
+    histories = [];
     try {
       http.Response res = await http
           .get(Uri.http(MyApp.backendIP, '/history/${MyApp.userInfo['uid']}'));
@@ -51,30 +63,40 @@ class HistoryWidget extends StatelessWidget {
         toastLength: Toast.LENGTH_SHORT,
       );
     }
-    print(histories.length);
   }
 
   @override
+  State<HistoryWidget> createState() => _HistoryWidgetState();
+}
+
+class _HistoryWidgetState extends State<HistoryWidget> {
+  @override
   Widget build(BuildContext context) {
-    print('exec');
-    getHistory();
-    return ListTile(
-      title: Row(
-        children: [
-          Text(data.travelPurpose),
-          Text(
-            data.isApproved == null
-                ? "Not Approved"
-                : (data.isApproved == true ? "Accepted" : "Rejected"),
-          ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Text(data.expectedDistance.toString()),
-          Text(data.pickupDateTime),
-          Text(data.pickupVenue),
-        ],
+    return Card(
+      child: ListTile(
+        title: Row(
+          children: [
+            Text(widget.data.travelPurpose),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Dist: ${widget.data.expectedDistance}'),
+            Text('Time: ${widget.data.pickupDateTime}'),
+          ],
+        ),
+        enabled: false,
+        isThreeLine: true,
+        trailing: Text(
+          widget.data.isApproved == null
+              ? "Not Approved"
+              : (widget.data.isApproved == true ? "Accepted" : "Rejected"),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        // dense: true,
+        // horizontalTitleGap: 30,
+        // leading: Text(this.index.toString()),
       ),
     );
   }

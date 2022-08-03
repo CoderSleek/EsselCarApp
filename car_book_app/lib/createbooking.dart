@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:car_book_app/historywidget.dart';
 import 'package:car_book_app/home_login.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
@@ -42,9 +43,9 @@ class _CreateBookingState extends State<CreateBooking> {
         "uid": MyApp.userInfo['uid'],
         "travelPurpose": _travelPurpose.text,
         "expectedDistance": _expectedDist.text,
-        "pickUpTimeDate": "${_selectedTime.text},  ${_dateinput.text}",
+        "pickupDateTime": "${_selectedTime.text},  ${_dateinput.text}",
         "pickupVenue": _pickupVenue.text,
-        "arrivalTimeDate": _expectedTime.text,
+        "arrivalDateTime": _expectedTime.text,
         "additionalInfo":
             _additionalInput.text != '' ? _additionalInput.text : null,
         "reqDateTime": DateTime.now().toString()
@@ -61,6 +62,7 @@ class _CreateBookingState extends State<CreateBooking> {
           body: jsonEncode(body));
 
       if (response.statusCode == 200) {
+        HistoryWidget.getHistory();
         Fluttertoast.showToast(msg: "Success", toastLength: Toast.LENGTH_SHORT);
       } else {
         Fluttertoast.showToast(
