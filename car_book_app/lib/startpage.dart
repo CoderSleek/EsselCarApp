@@ -13,6 +13,8 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     HistoryWidget.getHistory();
+    print(HistoryWidget.histories.length);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -33,7 +35,6 @@ class _StartPageState extends State<StartPage> {
             itemBuilder: (context, index) {
               return HistoryWidget(
                 data: HistoryWidget.histories[index],
-                key: Key("key"),
               );
             },
           ),
@@ -78,6 +79,7 @@ class _StartPageState extends State<StartPage> {
               ),
             ),
           ),
+          // HistoryWidget(data: HistoryWidget.histories[0]),
         ],
       ),
       drawer: MyDrawer(),

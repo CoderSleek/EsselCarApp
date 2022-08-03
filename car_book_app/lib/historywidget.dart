@@ -17,17 +17,6 @@ class HistoryData {
   late String? additionalInfo;
   late bool? isApproved;
 
-  // HistoryData(
-  //   this.uid,
-  //   this.travelPurpose,
-  //   this.expectedDistance,
-  //   this.pickupDateTime,
-  //   this.pickupVenue,
-  //   this.arrivalDateTime,
-  //   this.additionalInfo,
-  //   this.isApproved,
-  // );
-
   HistoryData.fromJson(Map<String, dynamic> item) {
     uid = item['uid'];
     travelPurpose = item['travelPurpose'];
@@ -35,12 +24,6 @@ class HistoryData {
     pickupDateTime = item['pickupDateTime'];
     pickupVenue = item['pickupVenue'];
     arrivalDateTime = item['arrivalDateTime'];
-    // if (item['additionalInfo'] == Null) {
-    //   print('yes');
-    // }
-    // isApproved = item['approvalStatus'];
-    // additionalInfo = null;
-    // isApproved = null;
     additionalInfo = item['additionalInfo'];
     isApproved = item['approvalStatus'];
   }
@@ -48,11 +31,10 @@ class HistoryData {
 
 class HistoryWidget extends StatelessWidget {
   static List<dynamic> histories = [];
+
   final HistoryData data;
 
-  const HistoryWidget({required Key key, required this.data})
-      : assert(data != null),
-        super(key: key);
+  const HistoryWidget({required this.data});
 
   static void getHistory() async {
     try {
@@ -61,25 +43,21 @@ class HistoryWidget extends StatelessWidget {
       List<dynamic> temp = jsonDecode(res.body);
 
       for (int i = 0; i < temp.length; ++i) {
-        // print(HistoryData.fromJson(temp[i]));
-        // print(temp[i]);
-        // print(temp[i].runtimeType);
-        // temp[i].forEach((k, v) => print(v.runtimeType));
         histories.add(HistoryData.fromJson(temp[i]));
       }
-      // print(histories);
     } catch (err) {
       Fluttertoast.showToast(
         msg: 'Connection Error',
         toastLength: Toast.LENGTH_SHORT,
       );
     }
+    print(histories.length);
   }
 
   @override
   Widget build(BuildContext context) {
     print('exec');
-    // getHistory();
+    getHistory();
     return ListTile(
       title: Row(
         children: [
@@ -99,20 +77,5 @@ class HistoryWidget extends StatelessWidget {
         ],
       ),
     );
-    //   child: Row(
-    //     children: [
-    //       Text("uid = ${histories[0]['uid']}"),
-    //       Text("travelPurpose = ${histories[0]['travelPurpose']}"),
-    //       Text("expectedDistance = ${histories[0]['expectedDistance']}"),
-    //       Text("pickupDateTime = ${histories[0]['pickupDateTime']}"),
-    //       Text("pickupVenue = ${histories[0]['pickupVenue']}"),
-    //       Text("arrivalDateTime = ${histories[0]['arrivalDateTime']}"),
-    //       Text("additionalInfo = ${histories[0]['additionalInfo']}"),
-    //       Text("isApproved = ${histories[0]['isApproved']}"),
-    //     ],
-    //   ),
-    // );
   }
 }
-
-// List<dynamic> histories = [];
