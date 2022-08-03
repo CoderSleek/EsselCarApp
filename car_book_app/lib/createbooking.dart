@@ -48,7 +48,6 @@ class _CreateBookingState extends State<CreateBooking> {
         "arrivalDateTime": _expectedTime.text,
         "additionalInfo":
             _additionalInput.text != '' ? _additionalInput.text : null,
-        "reqDateTime": DateTime.now().toString()
       };
       sendCreateBookingRequest(body);
     }
@@ -62,7 +61,7 @@ class _CreateBookingState extends State<CreateBooking> {
           body: jsonEncode(body));
 
       if (response.statusCode == 200) {
-        HistoryWidget.getHistory();
+        // HistoryWidget.getHistory();
         Fluttertoast.showToast(msg: "Success", toastLength: Toast.LENGTH_SHORT);
       } else {
         Fluttertoast.showToast(
@@ -334,7 +333,7 @@ class _CreateBookingState extends State<CreateBooking> {
                 ),
                 ElevatedButton(
                   onPressed: validateBookingInformation,
-                  child: const Text("Press me"),
+                  child: const Text("Send Information"),
                 ),
               ],
             ),

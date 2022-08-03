@@ -4,10 +4,10 @@ from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
 
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
 
-from fake_db import db_emp_det, db_book_inf
+# from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -26,7 +26,7 @@ class NewBooking(BaseModel):
     pickupVenue: str
     arrivalDateTime: str
     additionalInfo: Optional[str | None]
-    reqDateTime: str
+    reqDateTime: Optional[str]
 
 
 app = FastAPI()
@@ -66,15 +66,22 @@ def newbooking(req: NewBooking):
     # x = x.split(',  ')
     # x.reverse()
     # x = ' '.join(x)
-    regex = '^(\d\d:\d\d [A|P]M).+(\d\d)-(\d\d)-([\d]+)'
-    temp = re.findall(regex, req.pickupDateTime)
-    req.pickupDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
+    try:
+        regex = '^(\d\d:\d\d [A|P]M).+(\d\d)-(\d\d)-([\d]+)'
+        temp = re.findall(regex, req.pickupDateTime)
+        req.pickupDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
-    temp = re.findall(regex, req.arrivalDateTime)
-    req.arrivalDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
+        temp = re.findall(regex, req.arrivalDateTime)
+        req.arrivalDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
-    temp = re.findall('^([\d]+-\d\d-\d\d).(\d\d:\d\d)', req.reqDateTime)
-    req.reqDateTime = ' '.join(temp[0])
+        # temp = re.findall('^([\d]+-\d\d-\d\d).(\d\d:\d\d)', req.reqDateTime)
+        # req.reqDateTime = ' '.join(temp[0])
+        # temp = re.findall('^([\d]+)-(\d\d)-(\d\d).*(\d\d):(\d\d):(\d\d)', str(datetime.datetime.now()))
+        req.reqDateTime = str(datetime.datetime.now()).split('.')[0]
+    except:
+        response.status_code = status.HTTP_406_NOT_ACCEPTABLE
+        return "Bad Request"
+        
     try:
         db_book_inf().write(req)
     except err:
@@ -93,19 +100,10 @@ def setstatus(val: bool, bid: int):
 
 @app.get('/history/{uid}')
 def history(uid : int) -> list:
-    # print("inside function")
     try:
-        # print(uid, type(uid))
         rows_list = db_book_inf().read(uid)
-        # for row in rows_list:
-        #     print(row)
-        #     print(json.dumps(str(row)))
-        # print(rows_list)
-        # for row in rows_list:
-        #     print(row.emp_id, row.booking_id)
         json_list = []
         for row in rows_list:
-            # print(row.arrival_time_date)
             data = {'uid' : row.emp_id,
             'travelPurpose': row.trav_purpose,
             'expectedDistance': row.expected_dist,
@@ -120,9 +118,6 @@ def history(uid : int) -> list:
     except:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
-        pass
 
 if __name__ == '__main__':
     run(app, port=5000)
-    # newbooking(None)
-    # print(history(1))

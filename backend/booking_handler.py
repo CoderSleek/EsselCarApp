@@ -43,8 +43,8 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
     def write(self, request: NewBooking) -> bool:
         cursor = self.db_conn.cursor()
         cursor.execute(self.write_template, self.get_id(), request.uid, request.travelPurpose,
-        request.expectedDistance, request.pickUpTimeDate, request.pickupVenue,
-        request.arrivalTimeDate, request.additionalInfo, self.get_mng_id(request.uid),
+        request.expectedDistance, request.pickupDateTime, request.pickupVenue,
+        request.arrivalDateTime, request.additionalInfo, self.get_mng_id(request.uid),
         request.reqDateTime)
         
         cursor.commit()
