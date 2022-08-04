@@ -25,12 +25,7 @@ def send_email(reciever_email: str):
 <!DOCTYPE html>
 <html>
     <body>
-        <form action="127.0.0.1:5000/test" method="post">
-            <label for="fname">first name</label>
-            <input type="checkbox" id="box" value="yes">
-            <input type="checkbox" id="box" value="no">
-            <input type="submit" value="Submit">
-        </form>
+        <a href="www.google.com"><button type=button>click me</button></a>
     </body>
 </html>
 """, subtype='html')
