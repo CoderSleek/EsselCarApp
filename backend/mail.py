@@ -13,8 +13,8 @@ def send_email(reciever_email: str):
             # smt.starttls()
             # smt.ehlo()
 
-            smt.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-            # body = 'body'
+            smt.login(SENDER_EMAIL_ADDRESS, EMAIL_PASSWORD)
+            body = 'body'
 
             msg = EmailMessage()
             msg['Subject'] = 'Update on Essel Mining Vehicle booking'
@@ -22,13 +22,19 @@ def send_email(reciever_email: str):
             msg['To'] = reciever_email
             msg.set_content(body)
             msg.add_alternative("""\
+<!DOCTYPE html>
 <html>
-<body>
-<button type="button">click me</button>
-</body>
-</html>\
-""")
-
+    <body>
+        <form action="127.0.0.1:5000/test" method="post">
+            <label for="fname">first name</label>
+            <input type="checkbox" id="box" value="yes">
+            <input type="checkbox" id="box" value="no">
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
+""", subtype='html')
+            # msg = 'try'
             # smt.sendmail(SENDER_EMAIL_ADDRESS, reciever_email, msg)
             smt.send_message(msg)
 
