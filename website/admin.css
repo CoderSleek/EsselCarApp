@@ -2,8 +2,10 @@ body{
     margin: 0;
     padding: 0;
     font-family: "Trirong", serif;
-    background-image: url(image4.jpg);
-    background-size: contain;
+    background-image: url(./image4.jpg);
+    background-size: cover;
+    /* height: 100%; */
+    /* width: 100%; */
     background-repeat: no-repeat;
     background-position: center;
     font-weight: 900;
