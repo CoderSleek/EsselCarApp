@@ -120,7 +120,7 @@ def history(uid : int) -> list:
         return "Internal Server Error"
 
 # @app.put('/test?fname={}')
-# def t(val):
+# def t(val):s
 #     print(val)
 
 

@@ -34,7 +34,7 @@ def send_email(reciever_email: str):
     </body>
 </html>
 """, subtype='html')
-            # msg = 'try'
+            # msg = 'try's
             # smt.sendmail(SENDER_EMAIL_ADDRESS, reciever_email, msg)
             smt.send_message(msg)
 
