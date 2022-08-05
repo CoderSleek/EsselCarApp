@@ -30,3 +30,10 @@ Content-Type: application/json
 
 GET http://localhost:5000/history/1
 # Content-Type: application/json
+
+###
+
+POST http://localhost:5000/adminlogin
+Content-Type: application/json
+
+{"uname":"abcd","password":"efgh"}

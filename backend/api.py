@@ -29,6 +29,11 @@ class NewBooking(BaseModel):
     reqDateTime: Optional[str]
 
 
+class AdminLoginRequest(BaseModel):
+    uname: str
+    password: str
+
+
 app = FastAPI()
 
 @app.get('/')
@@ -119,8 +124,10 @@ def history(uid : int) -> list:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
+
 @app.post('/adminlogin')
-def adm_login(uname: str, password:str) -> str :
+def adm_login(req: AdminLoginRequest) -> str :
+    print('hello')
     return "success"
 
 
