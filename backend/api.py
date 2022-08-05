@@ -4,10 +4,10 @@ from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
 
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
 
-# from fake_db import db_emp_det, db_book_inf
+from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -119,9 +119,9 @@ def history(uid : int) -> list:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
-# @app.put('/test?fname={}')
-# def t(val):s
-#     print(val)
+@app.post('/adminlogin')
+def adm_login(uname: str, password:str) -> str :
+    return "success"
 
 
 if __name__ == '__main__':
