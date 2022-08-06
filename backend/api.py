@@ -136,8 +136,6 @@ def history(uid : int) -> list:
 # def adm_login(req: AdminLoginRequest) -> str :
 def adm(request: Request, response_class=HTMLResponse):
     return templates.TemplateResponse("admin.html", {"request":request})
-    # return FileResponse('C:/Users/user/Documents/codes/carbookapp/website/admin.html')
-    # return ""
 
 
 if __name__ == '__main__':
