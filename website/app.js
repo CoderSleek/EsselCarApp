@@ -2,15 +2,16 @@ async function verifyLogin(){
     const uname = document.getElementById('uname').value;
     const pass = document.getElementById('pass').value;
 
-    let x = await fetch(backend_url, {method: 'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, 
-        body:JSON.stringify({'uname':uname, 'password':pass})});
-    // console.log({'uname':uname, 'password':pass})
-    // console.log(JSON.stringify({'uname':uname, 'password':pass}))
-    // let x = await fetch(backend_url, {method: 'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, 
-    //     body:{"uname":`${uname}`, "password":`${pass}`}});
-    
-    // console.log(JSON.stringify({"uname":`${uname}`, "password":`${pass}`}))
-    console.log(x.headers)
+    try{
+        let response = await fetch(backend_url, {method: 'POST',
+            headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify({'uname': uname,'password':pass})});
+    } catch (err) {
+        alert('Network error')
+    }
+
+    let body = await response.json()
+    console.log(body)
 }
 
 const backend_url = 'http://localhost:5000/adminlogin';

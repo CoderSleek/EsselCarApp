@@ -1,5 +1,6 @@
 # from flask import Flask
 from fastapi import FastAPI, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
@@ -35,6 +36,13 @@ class AdminLoginRequest(BaseModel):
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get('/')
 def route():
@@ -126,9 +134,8 @@ def history(uid : int) -> list:
 
 
 @app.post('/adminlogin')
-def adm_login(req: AdminLoginRequest) -> str :
-    print('hello')
-    return "success"
+def adm_login(req: AdminLoginRequest):
+    pass
 
 
 if __name__ == '__main__':
