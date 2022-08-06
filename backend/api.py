@@ -10,10 +10,10 @@ from pydantic import BaseModel
 from typing import Optional
 from pathlib import Path
 
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
 
-from fake_db import db_emp_det, db_book_inf
+# from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -52,12 +52,12 @@ app.add_middleware(
 
 app.mount('/static', StaticFiles(
     # directory="C:/Users/user/Documents/codes/carbookapp/website/static"),
-    directory="./website"),
+    directory="../website"),
     name="static")
 
 templates = Jinja2Templates(
     # directory='C:/Users/user/Documents/codes/carbookapp/website')
-    directory="./website")
+    directory="../website")
 
 
 @app.get('/')
@@ -151,8 +151,12 @@ def history(uid : int) -> list:
 
 @app.post('/admincredcheck')
 def adm_login(req: AdminLoginRequest):
-    # print(req.uname, req.password)
-    return {'uname':req.uname, 'pass':req.password}
+    return req.uname == 'admin' and req.password == 'admin'
+
+
+# @app.get('/adminpage')
+# def page(request : Request):
+#     return templates.TemplateResponse("index.html", {"request":request})
 
 
 @app.get('/adminlogin')
@@ -162,5 +166,3 @@ def adm(request: Request):
 
 if __name__ == '__main__':
     run(app, port=5000)
-    # print(os.path.abspath(os.path.expanduser('website')))
-    # print('C:/Users/user/Documents/codes/carbookapp/website')
