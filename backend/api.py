@@ -1,13 +1,15 @@
 # from flask import Flask
 from fastapi import FastAPI, Response, status, Request
-from uvicorn import run
-from pydantic import BaseModel
-from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-import os
+
+from uvicorn import run
+from pydantic import BaseModel
+from typing import Optional
 from pathlib import Path
+
 # from login_handler import db_handler as db_emp_det
 # from booking_handler import db_handler as db_book_inf
 
@@ -39,9 +41,24 @@ class AdminLoginRequest(BaseModel):
 
 
 app = FastAPI()
-app.mount('/static', StaticFiles(directory="C:/Users/user/Documents/codes/carbookapp/website/static"), name="static")
-# templates = Jinja2Templates(directory=(os.path.abspath(os.path.expanduser('templates'))))
-templates = Jinja2Templates(directory='C:/Users/user/Documents/codes/carbookapp/website')
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount('/static', StaticFiles(
+    # directory="C:/Users/user/Documents/codes/carbookapp/website/static"),
+    directory="./website"),
+    name="static")
+
+templates = Jinja2Templates(
+    # directory='C:/Users/user/Documents/codes/carbookapp/website')
+    directory="./website")
+
 
 @app.get('/')
 def route():
@@ -132,9 +149,14 @@ def history(uid : int) -> list:
         return "Internal Server Error"
 
 
+@app.post('/admincredcheck')
+def adm_login(req: AdminLoginRequest):
+    # print(req.uname, req.password)
+    return {'uname':req.uname, 'pass':req.password}
+
+
 @app.get('/adminlogin')
-# def adm_login(req: AdminLoginRequest) -> str :
-def adm(request: Request, response_class=HTMLResponse):
+def adm(request: Request):
     return templates.TemplateResponse("admin.html", {"request":request})
 
 
