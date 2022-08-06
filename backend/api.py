@@ -149,14 +149,15 @@ def history(uid : int) -> list:
         return "Internal Server Error"
 
 
-@app.get('/adminlogin')
-def adm(request: Request, response_class=HTMLResponse):
-    return templates.TemplateResponse("admin.html", {"request":request})
-
-
-@app.post('/admincheck')
+@app.post('/admincredcheck')
 def adm_login(req: AdminLoginRequest):
-    pass
+    # print(req.uname, req.password)
+    return {'uname':req.uname, 'pass':req.password}
+
+
+@app.get('/adminlogin')
+def adm(request: Request):
+    return templates.TemplateResponse("admin.html", {"request":request})
 
 
 if __name__ == '__main__':

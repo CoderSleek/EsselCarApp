@@ -3,18 +3,18 @@ async function verifyLogin(){
     const pass = document.getElementById('pass').value;
 
     try{
-        let response = await fetch(backend_url, {method: 'POST',
-            headers:{'Content-Type':'application/json'}, 
+        let response = await fetch('http://localhost:5000/admincredcheck',
+            {method: 'POST', headers:{'Content-Type':'application/json'}, 
             body: JSON.stringify({'uname': uname,'password':pass})});
+
+        let body = await response.json()
+        console.log(body)
     } catch (err) {
         alert('Network error')
     }
-
-    let body = await response.json()
-    console.log(body)
 }
 
-const backend_url = 'http://localhost:5000/adminlogin';
+const backend_url = 'http://localhost:5000/';
 
 const logInBtn  = window.document.getElementById('login')
 logInBtn.addEventListener('click', verifyLogin)
