@@ -1,5 +1,6 @@
 # from flask import Flask
-from fastapi import FastAPI, Response, status, Request
+from fastapi import FastAPI, Response, status, Request, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse
@@ -12,7 +13,7 @@ from pathlib import Path
 
 from login_handler import db_handler as db_emp_det
 from booking_handler import db_handler as db_book_inf
-
+import jwt_handler as jwt
 # from fake_db import db_emp_det, db_book_inf
 
 import json
@@ -150,14 +151,29 @@ def history(uid : int) -> list:
 
 
 @app.post('/admincredcheck')
-def adm_login(req: AdminLoginRequest):
-    return req.uname == 'admin' and req.password == 'admin'
+def adm_login(req: AdminLoginRequest) -> str:
+    if req.uname == 'admin' and req.password == 'admin':
+        return jwt.signJWT(req.uname, req.password)
 
+class tokenType(BaseModel):
+    token: str
 
-# @app.get('/adminpage')
-# def page(request : Request):
-#     return templates.TemplateResponse("index.html", {"request":request})
-
+@app.get('/adminpage')
+def page(token : tokenType, request: Request):
+    # return templates.TemplateResponse("index.html", {"request":request})
+    print(token.token)
+    # try:
+    #     package = jwt.decodeJWT(token)
+    #     if package['userName'] == 'admin' and package['password'] == 'admin':
+    #         print('inside if')
+    #         return templates.TemplateResponse("adminpage.html", {"request":request})
+    #     else:
+    #         print('inside else')
+    #         return templates.TemplateResponse("error.html", {"request": request})
+    # except err:
+    #     print('inside except', err)
+    #     return templates.TemplateResponse("error.html", {"request": request})
+    
 
 @app.get('/adminlogin')
 def adm(request: Request):

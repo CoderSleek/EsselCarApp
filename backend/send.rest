@@ -40,3 +40,11 @@ Content-Type: application/json
 ###
 
 GET http://localhost:5000/adminlogin
+
+
+###
+
+GET http://localhost:5000/adminpage
+Content-Type: application/json
+
+{"token":"randomstuff"}

@@ -7,13 +7,15 @@ async function verifyLogin(){
             {method: 'POST', headers:{'Content-Type':'application/json'}, 
             body: JSON.stringify({'uname': uname,'password':pass})});
 
-        let body = await response.json()
-        console.log(body)
-        // if(body){
-        //     window.location.href = backend_url+'adminpage';
-        // }
+        let token = await response.json()
+        // console.log(body)
+
+
+        if(token){
+            window.location.href = backend_url+'adminpage?token='+token;
+        }
     } catch (err) {
-        alert('Network error')
+        alert('Some error Occured')
     }
 }
 
