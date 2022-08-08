@@ -14,10 +14,10 @@ async function verifyLogin(){
 
 
         if(token){
-            // window.location.href = backend_url+'adminpage?token='+token;
-            console.log('fetching')
-            fetch(backend_url+'adminpage', {method: 'get', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({"token":"randomstuff"})})
+            window.location.href = backend_url+'adminpage?token='+token;
+            // console.log('fetching')
+            // fetch(backend_url+'adminpage', {method: 'get', headers:{'Content-Type':'application/json'},
+            // body:JSON.stringify({"token":"randomstuff"})})
         }
     } catch (err) {
         alert('Some error Occured')
