@@ -13,6 +13,36 @@ body{
     background-color: beige;
 }
 
+.content::-webkit-scrollbar{
+    height: 5px;
+    display: none;
+}
+.content::-webkit-scrollbar-track{
+    background-color: lightgray;
+}
+/* .content::-webkit-scrollbar-track-piece{
+    background-color: lightgray;
+    width: 20px;
+} */
+.content::-webkit-scrollbar-thumb{
+    background-color: green;
+    height: 1px;
+    border-radius: 5px;
+}
+.content::-webkit-scrollbar-corner{
+    display: none;
+}
+.content::-webkit-resizer{
+    display: none;
+}
+.content:hover::-webkit-scrollbar{
+    display: block;
+}
+
+.content-box::-webkit-scrollbar{
+    display: none;
+}
+
 .content-box{
     /* display: flex; */
     /* padding: 100px; */
@@ -20,6 +50,7 @@ body{
     height: 60%;
     width: 60vw;
     border: 1px solid black;
+    overflow-y: auto;
 }
 
 .content{
@@ -28,21 +59,59 @@ body{
     padding: 4px 4px 4px 10px;
     border: 1px solid green;
     border-radius: 8px;
-    height: 60px;
+    height: 150px;
+    min-height: fit-content;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
     font-size: 18px;
-    font-family: 'Trebuchet MS', sans-serif;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .rowitems{
+    white-space: nowrap;
+    /* overflow-y: scroll; */
     display: flex;
     flex-direction: row;
     padding-bottom: 3px;
-    /* justify-content: space-evenly; */
+    justify-content: space-between;
     /* margin: 20px; */
-    background-color: yellow;
+    /* background-color: yellow; */
 }
 
 .eachitem{
     margin-right: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* margin-right: 50px; */
+}
+
+.heading{
+    font-family: 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+}
+
+.btn-class{
+    /* align-self: center; */
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    /* color: aqua; */
+    border: none;
+    font-size: 18px;
+    /* background-color: #008CBA; */
+    background-color: #009ace;
+    border-radius: 4px;
+    /* width: 40px; */
+    padding: 5px 8px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    color: white;
+}
+
+.btn-class:hover{
+    background-color: #00b1ec;
+    box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
+}
+
+.btn-class:active{
+    background-color: #168eb6;
+    box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
 }
