@@ -182,14 +182,19 @@ def adm(request: Request):
 
 @app.post('/getbookingrequests')
 def getreq(page: int):
-    row_list = []
+    row_list = list
+    db_rows = db_book_inf().get_rows()
     for i in range(page):
-        db_rows = db_book_inf().get_rows()
-        print(db_rows)
-        for j in db_rows:
-            print(j)
+        row_list = []
+        for j in range(10):
+            try:
+                row_list.append(db_rows.__next__())
+            except:
+                break
+
+    return row_list
 
 
 if __name__ == '__main__':
     # run(app, port=5000)
-    getreq(1)
+    print(getreq(1))

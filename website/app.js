@@ -3,12 +3,11 @@ async function verifyLogin(){
     const pass = document.getElementById('pass').value;
 
     try{
-        // let response = await fetch(backend_url+'admincredcheck',
-        //     {method: 'POST', headers:{'Content-Type':'application/json'}, 
-        //     body: JSON.stringify({'uname': uname,'password':pass})});
+        let response = await fetch(backend_url+'admincredcheck',
+            {method: 'POST', headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify({'uname': uname,'password':pass})});
 
-        // let token = await response.json()
-        let token = true;
+        let token = await response.json()
 
         // console.log(body)
 
