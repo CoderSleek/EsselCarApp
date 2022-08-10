@@ -61,5 +61,9 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         cursor = self.db_conn.cursor()
         return cursor.execute("SELECT * FROM booking_info WHERE emp_id=? ORDER BY request_date_time DESC;", uid).fetchmany(rowcount)
 
+
+    def get_rows(self):
+        cursor = self.db_conn.cursor()
+        return cursor.execute("SELECT * FROM booking_info ORDER BY request_date_time DESC;")
 # new = db_handler()
 # new.read()

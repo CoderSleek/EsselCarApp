@@ -11,10 +11,10 @@ from pydantic import BaseModel
 from typing import Optional
 from pathlib import Path
 
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
 import jwt_handler as jwt
-# from fake_db import db_emp_det, db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -180,5 +180,16 @@ def adm(request: Request):
     return templates.TemplateResponse("admin.html", {"request":request})
 
 
+@app.post('/getbookingrequests')
+def getreq(page: int):
+    row_list = []
+    for i in range(page):
+        db_rows = db_book_inf().get_rows()
+        print(db_rows)
+        for j in db_rows:
+            print(j)
+
+
 if __name__ == '__main__':
-    run(app, port=5000)
+    # run(app, port=5000)
+    getreq(1)

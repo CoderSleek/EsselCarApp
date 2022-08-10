@@ -87,6 +87,10 @@ class db_book_inf:
 
         return x
 
+
+    def get_rows(self):
+        return iter(self.items)
+
 new1 = db_emp_det()
 new2 = db_book_inf()
 

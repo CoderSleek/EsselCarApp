@@ -1,4 +1,5 @@
 
+
 data = [{'bookingID':1,'empID':1}, {'bookingID':2,'empID':2},]
 
 data.forEach((element, index) => {
@@ -23,29 +24,23 @@ data.forEach((element, index) => {
         <div class="eachitem"><span class="heading">Manager ID: </span>${element.bookingID}</div>
         <div class="eachitem"><span class="heading">Additional Information: </span>${element.bookingID}</div>
     </div>
-    <div class="rowitems"><button type="button" class="btn-class">Click me</button></div>
+    <div class="rowitems"><button type="button" class="btn-class">${'a'}</button></div>
 `
 
     const new_card = document.createElement('div');
     new_card.classList = 'content';
     new_card.id = 'card'+index;
     new_card.innerHTML += itemContent
-    if(index == 0){
-        // console.log(index)
-        btn = new_card.querySelector('.btn-class');
-        btn.disabled = true;
-    }
+    // if(index){
+    //     btn = new_card.querySelector('.btn-class');
+    //     btn.disabled = true;
+    // }
     window.document.querySelector('.content-box').appendChild(new_card)
     
 });
 
-// for(let i =0; i < 5; ++i){
-//     const item = new_card_creator(i)
-//     item.innerHTML += itemContent
-    
-// }
 
-// function new_card_creator(i){
-
-//     return new_card;
-// }
+btn = document.querySelectorAll('.btn-class')
+btn.forEach((element)=>{
+    element.addEventListener('click', )
+})
