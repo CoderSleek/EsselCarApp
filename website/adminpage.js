@@ -1,23 +1,39 @@
-const BACKEND_URL = 'http://127.0.0.1/'
+const BACKEND_URL = 'http://127.0.0.1/';
 let page_number = 1
 
-function get_data(){
-    response = await fetch(BACKEND_URL + 'getbookingrequests',
-    {method: 'post', body: JSON.stringify(page_number),
-    headers: {'Content-Type':'application/json'}})
+async function get_data(){
+    let data = []
+    try{
+        response = await fetch(BACKEND_URL + 'getbookingrequests',
+        {method: 'post', body: JSON.stringify(page_number),
+        headers: {'Content-Type':'application/json'}});
 
-    let data = await response.json()
-
-    data = []
-    if(!data){
-        window.document.querySelector('.content-box').textContent = 'No Data'
+        data = await response.json();
+    } catch (err) {
+        alert('Connectivity Issue');
     }
 
-    display_data();
+    if(data.length == 0 || data === undefined || data === null){
+        window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
+        left:50%;right:50%;top:50%;bottom:50%;">
+        No Content</span>`;
+
+        return;
+    }
+
+    display_data(data);
 }
 
 
-function display_data(){
+function display_data(data){
+
+    if(data.length == 0 || data === undefined || data === null){
+        window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
+        left:50%;right:50%;top:50%;bottom:50%;">
+        No Content</span>`
+        return;
+    }
+
     data.forEach((element, index) => {
         const itemContent = 
     `
@@ -56,9 +72,8 @@ function display_data(){
 }
 
 get_data()
-display_data()
 
 btn = document.querySelectorAll('.btn-class')
 btn.forEach((element)=>{
-    element.addEventListener('click', )
+    // element.addEventListener('click', )
 })
