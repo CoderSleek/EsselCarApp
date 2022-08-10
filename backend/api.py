@@ -12,9 +12,9 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
-from fake_db import db_emp_det, db_book_inf
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
+# from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -40,6 +40,9 @@ class AdminLoginRequest(BaseModel):
     uname: str
     password: str
 
+
+class PageNumber(BaseModel):
+    num : int
 
 app = FastAPI()
 
@@ -181,10 +184,11 @@ def adm(request: Request):
 
 
 @app.post('/getbookingrequests')
-def getreq(page: int):
+def getreq(page : PageNumber):
+    print(page.num)
     row_list = list
     db_rows = db_book_inf().get_rows()
-    for i in range(page):
+    for i in range(page.num):
         row_list = []
         for j in range(10):
             try:
@@ -192,9 +196,25 @@ def getreq(page: int):
             except:
                 break
 
+    for i in range(len(row_list)):
+        row_list[i] = {
+            'bookingID': row_list[i].booking_id,
+            'empID' : row_list[i].emp_id,
+            'travelPurpose': row_list[i].trav_purpose,
+            'expectedDist': row_list[i].expected_dist,
+            'pickupDateTime': row_list[i].pickup_date_time,
+            'pickupVenue': row_list[i].pickup_venue,
+            'arrivalDateTime': row_list[i].arrival_date_time,
+            'additionalInfo': row_list[i].additional_info,
+            'mngID': row_list[i].mng_id,
+            'isApproved': row_list[i].approval_status,
+            'requestDateTime': row_list[i].request_date_time
+        }
+
+    # print(row_list)
     return row_list
 
 
 if __name__ == '__main__':
-    # run(app, port=5000)
-    print(getreq(1))
+    run(app, port=5000)
+    # print(getreq(1))

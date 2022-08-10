@@ -48,3 +48,10 @@ GET http://localhost:5000/adminpage
 Content-Type: application/json
 
 {"token":"randomstuff"}
+
+###
+
+POST http://localhost:5000/getbookingrequests
+Content-Type: application/json
+
+{"num":1}
