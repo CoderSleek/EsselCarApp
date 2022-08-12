@@ -115,3 +115,45 @@ body{
     background-color: #168eb6;
     box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
 }
+
+.modal{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    /* height: 60%; */
+    height: fit-content;
+    width: 40%;
+    /* background-color: brown; */
+    background-color: whitesmoke;
+    border: 1px solid gray;
+    border-radius: 11px;
+    /* background-color: rgba(66, 64, 64, 0.3); */
+    padding: 11px;
+    font-size: 18px;
+    /* text-align: center; */
+}
+
+.hide-body{
+    background-color: rgba(32, 32, 32, 0.5);
+}
+
+.close-btn{
+    position: relative;
+    float: right;
+}
+
+.hide{
+    display: none;
+}
+
+.modal > *:not(:first-child, :last-child){
+    padding-top: 15px;
+}
+
+.modal input{
+    float: right;
+    margin-right: 20%;
+    border-radius: 6px;
+    /* border: 1px solid black; */
+}

@@ -37,45 +37,57 @@ function display_data(data){
     }
 
     data.forEach((element, index) => {
+        approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected')
         const itemContent = 
     `
         <div class="rowitems">
-            <div class="eachitem"><span class="heading">Booking id:</span>${element.bookingID}</div>
-            <div class="eachitem"><span class="heading">User id:</span>${element.empID}</div>
-            <div class="eachitem"><span class="heading">Purpose:</span>${element.travelPurpose}</div>
+            <div class="eachitem"><span class="heading">Booking id: </span>${element.bookingID}</div>
+            <div class="eachitem"><span class="heading">User id: </span>${element.empID}</div>
+            <div class="eachitem"><span class="heading">Purpose: </span>${element.travelPurpose}</div>
         </div>
         <div class="rowitems">
             <div class="eachitem"><span class="heading">Expected Distance: </span>${element.expectedDist}</div>
             <div class="eachitem"><span class="heading">Pickup Venue: </span>${element.pickupVenue}</div>
-            <div class="eachitem"><span class="heading">Approval Status: </span>${element.isApproved}</div>
+            <div class="eachitem"><span class="heading">Approval Status: </span>${approvalStatus}</div>
         </div>
         <div class="rowitems">
-            <div class="eachitem"><span class="heading">Pickup Date & Time:</span>${element.pickupDateTime}</div>
-            <div class="eachitem"><span class="heading">Arrival Date & Time:</span>${element.arrivalDateTime}</div>
-            <div class="eachitem"><span class="heading">Request Date & Time:</span>${element.requestDateTime}</div>
+            <div class="eachitem"><span class="heading">Pickup Date & Time: </span>${element.pickupDateTime}</div>
+            <div class="eachitem"><span class="heading">Arrival Date & Time: </span>${element.arrivalDateTime}</div>
+            <div class="eachitem"><span class="heading">Request Date & Time: </span>${element.requestDateTime}</div>
         </div>
         <div class="rowitems">
             <div class="eachitem"><span class="heading">Manager ID: </span>${element.mngID}</div>
             <div class="eachitem"><span class="heading">Additional Information: </span>${element.additionalInfo != null ? element.additionalInfo : 'None'}</div>
         </div>
-        <div class="rowitems"><button type="button" class="btn-class">${'a'}</button></div>
+        <div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>
     `
 
         const new_card = document.createElement('div');
         new_card.classList = 'content';
         new_card.id = 'card'+index;
         new_card.innerHTML += itemContent
-        // if(index){
+        // if(element.isApproved !== true){
         //     btn = new_card.querySelector('.btn-class');
         //     btn.disabled = true;
         // }
-        window.document.querySelector('.content-box').appendChild(new_card)  
+        window.document.querySelector('.content-box').appendChild(new_card)
     });
 }
 
-get_data()
+function togglemodal(){
+    document.getElementById('modal').classList.toggle('hide');
+    // document.getElementById('close-btn').classList.toggle('hide');
+    document.body.classList.toggle('hide-body');
+    document.body.childNodes.disabled = true;
+}
 
-btn = document.querySelectorAll('.btn-class')
-btn.forEach((element)=>{
-    // element.addEventListener('click', )
-})
+function assigneventlistener(){
+    btn = document.querySelectorAll('.btn-class');
+    btn.forEach((element)=>{
+        element.addEventListener('click', togglemodal);
+    })
+}
+
+get_data().then(assigneventlistener);
+
+document.getElementById('close-btn').addEventListener('click', togglemodal)
