@@ -1,12 +1,13 @@
 const BACKEND_URL = 'http://127.0.0.1:5000/';
 let page_number = 1
+let data = []
 
 async function get_data(){
-    // let data = []
-    let data = [
-        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"10:33 AM 04-08-2022"},
-        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"04:00 PM 31-07-2022"},
-        {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022"}
+    // data = []
+    data = [
+        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":true},
+        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":false},
+        {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022", "hasInfoFilled":false}
     ]
     // try{
     //     response = await fetch(BACKEND_URL + 'getbookingrequests',
@@ -64,27 +65,45 @@ function display_data(data){
             <div class="eachitem"><span class="heading">Manager ID: </span>${element.mngID}</div>
             <div class="eachitem"><span class="heading">Additional Information: </span>${element.additionalInfo != null ? element.additionalInfo : 'None'}</div>
         </div>
-        <div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>
     `
 
         const new_card = document.createElement('div');
         new_card.classList = 'content';
         new_card.id = 'card'+index;
         new_card.innerHTML += itemContent;
-        // if(element.isApproved !== true){
-        //     btn = new_card.querySelector('.btn-class');
-        //     btn.disabled = true;
-        // }
+
+        if(element.isApproved === true){
+            const new_div = document.createElement('div');
+            new_div.className = 'rowitems';
+            const new_btn = document.createElement('button');
+            new_btn.type = 'button';
+            new_btn.className = 'btn-class';
+            new_div.appendChild(new_btn);
+
+            if(element.hasInfoFilled === true){
+                new_btn.textContent = 'Set Vehicle Information';
+            } else {
+                new_btn.textContent = 'View Vehicle Information'
+            }
+            new_card.appendChild(new_div);
+
+
+            // new_card.innerHTML+=
+            // `<div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>`
+        }
+
         window.document.querySelector('.content-box').appendChild(new_card);
-        // console.log(new_card.id);
     });
 }
 
-function createModal(){
+function createNewInfoModal(){
+    booking_id = event.target.parentNode.parentNode.id;
+    booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
+
     const modal = document.getElementById('modal');
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
-        <span style="font-family: 'Segoe UI';">Fill Information For booking id: </span>
+        <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${booking_id}</span>
         <div class="eachrow"><span class="heading">Vehicle Registration Number: </span><input id="vehRegNum"></div>
         <div class="eachrow">
             <span class="heading">Vehicle Model: </span><input id="vehModel">
@@ -115,24 +134,40 @@ function createModal(){
         </div>
         <button type="button" id="submit" class="btn-class" style="left:50%; transform: translate(-50%); margin-top: 18px;">Submit</button>
         `
-
+        togglemodal();
         modal.innerHTML = modalHtml;
         modal.querySelector('.close-btn').addEventListener('click', togglemodal);
-        document.getElementById('modal').classList.toggle('hide');
+        // document.getElementById('modal').classList.toggle('hide');
 }
 
 function togglemodal(){
-    createModal();
+    // createModal
     // document.getElementById('close-btn').classList.toggle('hide');
+    document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');
     // document.body.childNodes.disabled = true;
 }
 
+function createViewInfoModal(){
+    console.log('view info');
+}
+
 function assigneventlistener(){
-    btn = document.querySelectorAll('.btn-class');
-    btn.forEach((element)=>{
-        element.addEventListener('click', togglemodal);
+    // btn = document.querySelectorAll('.btn-class');
+    content_view = document.querySelectorAll('.content');
+    console.log(content_view);
+    content_view.forEach((element)=>{
+        
     })
+    // btn.forEach((element)=>{
+    //     if(element.hasInfoFilled === true){
+    //         element.addEventListener('click', createViewInfoModal);
+    //     } else {
+    //         console.log(element);
+    //         element.addEventListener('click', createNewInfoModal);
+    //     }
+    // })
+
 }
 
 get_data().then(assigneventlistener);
