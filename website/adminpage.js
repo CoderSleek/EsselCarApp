@@ -5,8 +5,8 @@ let data = []
 async function get_data(){
     // data = []
     data = [
-        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":true},
-        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":false},
+        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":false},
+        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":true},
         {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022", "hasInfoFilled":false}
     ]
     // try{
@@ -81,9 +81,9 @@ function display_data(data){
             new_div.appendChild(new_btn);
 
             if(element.hasInfoFilled === true){
-                new_btn.textContent = 'Set Vehicle Information';
+                new_btn.textContent = 'View Vehicle Information';
             } else {
-                new_btn.textContent = 'View Vehicle Information'
+                new_btn.textContent = 'Set Vehicle Information';
             }
             new_card.appendChild(new_div);
 
@@ -134,30 +134,110 @@ function createNewInfoModal(){
         </div>
         <button type="button" id="submit" class="btn-class" style="left:50%; transform: translate(-50%); margin-top: 18px;">Submit</button>
         `
-        togglemodal();
         modal.innerHTML = modalHtml;
         modal.querySelector('.close-btn').addEventListener('click', togglemodal);
-        // document.getElementById('modal').classList.toggle('hide');
+        togglemodal();
+        modal.querySelector('#submit').addEventListener('click', sendInfo);
+}
+
+function sendInfo(){
+        const idString = event.target.parentNode.children[1].textContent;
+        const idNumber = idString.match(new RegExp("\\d+$"))[0];
+
+        const packet = {
+        "bookingId": idNumber,
+        "vehRegNum": document.getElementById("vehRegNum").value,
+        "vehModel": document.getElementById("vehModel").value,
+        "licenseExp": document.getElementById("licenseExp").value,
+        "insuranceExp": document.getElementById("insuranceExp").value,
+        "pucExp": document.getElementById("pucExp").value,
+        "driverName": document.getElementById("driverName").value,
+        "driverAddress": document.getElementById("driverAddress").value,
+        "licenseNumber": document.getElementById("licenseNumber").value,
+        "driverContact": document.getElementById("driverContact").value,
+        "travContact": document.getElementById("travContact").value
+    }
+    
+    // const res = fetch(BACKEND_URL, {method:'post', headers:{headers: {'Content-Type':'application/json'}},
+    // body: JSON.stringify(packet)})
+
+    const res = true;
+
+    if(res){
+        const x = data.findIndex((element) => 
+        {return element.bookingID === parseInt(idNumber)})
+        data[x].hasInfoFilled = true;
+        const view_btn = document.querySelectorAll('.content')[x].querySelector('.btn-class');
+        view_btn.textContent = 'View Vehicle Information';
+        view_btn.removeEventListener('click', createNewInfoModal, true);
+        view_btn.addEventListener('click', createViewInfoModal);
+    }
 }
 
 function togglemodal(){
-    // createModal
-    // document.getElementById('close-btn').classList.toggle('hide');
     document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');
     // document.body.childNodes.disabled = true;
 }
 
 function createViewInfoModal(){
-    console.log('view info');
+    let booking_id = event.target.parentNode.parentNode.id;
+    booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
+
+    let element_data = fetch();
+    const modal = document.getElementById('modal');
+    const modalHtml = `
+        <button type="button" class="close-btn" id="close-btn">X</button>
+        <span style="font-family: 'Segoe UI';">Viewing Information For booking id: ${booking_id}</span>
+        <div class="eachrow">
+            <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" disabled value="${element_data.vehRegNum}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Vehicle Model: </span><input id="vehModel" disabled value="${element_data.vehModel}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">License Expiry Date: </span><input id="licenseExp" disabled value="${element_data.licenseExp}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Insurance Expiry Date: </span><input id="insuranceExp" disabled value="${element_data.insuranceExp}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">PUC Expiry Date: </span><input id="pucExp" disabled value="${element_data.pucExp}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Driver Name: </span><input id="driverName" disabled value="${element_data.driverName}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Driver Address: </span><input id="driverAddress" disabled value="${element_data.driverAddress}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">License Number: </span><input id="licenseNumber" disabled value="${element_data.licenseNumber}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Driver Contact Information: </span><input id="driverContact" type="tel" disabled value="${element_data.driverContact}">
+        </div>
+        <div class="eachrow" style="padding-top:15px !important;">
+            <span class="heading">Travel Agent Contact: </span><input id="travContact" type="tel" disabled value="${element_data.travContact}">
+        </div>
+        `;
+
+        modal.innerHTML = modalHtml;
+        modal.querySelector('.close-btn').addEventListener('click', togglemodal);
+        togglemodal();
 }
 
 function assigneventlistener(){
     // btn = document.querySelectorAll('.btn-class');
-    content_view = document.querySelectorAll('.content');
-    console.log(content_view);
+    const content_view = document.querySelectorAll('.content');
     content_view.forEach((element)=>{
-        
+        const content_view_id = data[element.id.charAt(element.id.length-1)];
+        if(content_view_id.isApproved === true){
+            if(content_view_id.hasInfoFilled === true){
+                element.lastElementChild.firstChild.addEventListener('click', createViewInfoModal);
+            } else {
+                element.lastElementChild.firstChild.addEventListener('click', createNewInfoModal, true);
+            }
+        }
     })
     // btn.forEach((element)=>{
     //     if(element.hasInfoFilled === true){
