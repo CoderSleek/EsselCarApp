@@ -14,6 +14,7 @@ from pathlib import Path
 import jwt_handler as jwt
 from login_handler import db_handler as db_emp_det
 from booking_handler import db_handler as db_book_inf
+from vehicle_handler import db_handler as db_book_veh
 # from fake_db import db_emp_det, db_book_inf
 
 import json
@@ -184,7 +185,7 @@ def adm(request: Request):
 
 
 @app.post('/getbookingrequests')
-def getreq(page : PageNumber):
+async def getreq(page : PageNumber):
 
     row_list = list
     db_rows = db_book_inf().get_rows()
@@ -212,7 +213,8 @@ def getreq(page : PageNumber):
             'additionalInfo': row_list[i].additional_info,
             'mngID': row_list[i].mng_id,
             'isApproved': row_list[i].approval_status,
-            'requestDateTime': requestDateTime
+            'requestDateTime': requestDateTime,
+            'hasInfoFilled': db_book_veh().filled()
         }
         
     return row_list
