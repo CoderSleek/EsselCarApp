@@ -1,9 +1,9 @@
 const BACKEND_URL = 'http://127.0.0.1:5000/';
 let page_number = 1
-let data = []
+let data = [];
 
 async function get_data(){
-    // data = []
+    data = [];
     data = [
         {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":false},
         {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":true},
@@ -29,21 +29,16 @@ async function get_data(){
         return;
     }
 
-    display_data(data);
+    display_data();
 }
 
 
-function display_data(data){
+function display_data(){
 
-    if(data.length == 0 || data === undefined || data === null){
-        window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
-        left:50%;right:50%;top:50%;bottom:50%;">
-        No Content</span>`
-        return;
-    }
-
+    const content_box = window.document.querySelector('.content-box');
+    content_box.innerHTML = "";
     data.forEach((element, index) => {
-        approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected')
+        const approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected')
         const itemContent = 
     `
         <div class="rowitems">
@@ -92,7 +87,7 @@ function display_data(data){
             // `<div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>`
         }
 
-        window.document.querySelector('.content-box').appendChild(new_card);
+        content_box.appendChild(new_card);
     });
 }
 
@@ -216,8 +211,20 @@ function createViewInfoModal(){
         <div class="eachrow">
             <span class="heading">Driver Contact Information: </span><input id="driverContact" type="tel" disabled value="${element_data.driverContact}">
         </div>
-        <div class="eachrow" style="padding-top:15px !important;">
+        <div class="eachrow">
             <span class="heading">Travel Agent Contact: </span><input id="travContact" type="tel" disabled value="${element_data.travContact}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">In Distance: </span><input disabled value="${element_data.inDist ?? 'Not Updated'}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">Out Distance: </span><input disabled value="${element_data.outDist ?? 'Not Updated'}">
+        </div>
+        <div class="eachrow">
+            <span class="heading">In Time: </span><input disabled value="${element_data.inTime ?? 'Not Updated'}">
+        </div>
+        <div class="eachrow" style="padding-top:15px !important;">
+            <span class="heading">Out Time: </span><input disabled value="${element_data.outTime ?? 'Not Updated'}">
         </div>
         `;
 
@@ -247,7 +254,30 @@ function assigneventlistener(){
     //         element.addEventListener('click', createNewInfoModal);
     //     }
     // })
-
 }
 
-get_data().then(assigneventlistener);
+function assignPageNumber(){
+    const btn_div = document.querySelector('#pg_num');
+    btn_div.textContent = ` Page Number ${page_number}`;
+}
+
+function prevPage(){
+    if(page_number <= 1) return;
+    page_number -=1;
+    initializePage();
+}
+
+function nextPage(){
+    if(data.length == 0) return;
+    page_number += 1;
+    initializePage();
+}
+
+function initializePage(){
+    get_data().then(assigneventlistener);
+    assignPageNumber();
+}
+
+initializePage();
+document.getElementById('prev_page').addEventListener('click', prevPage);
+document.getElementById('next_page').addEventListener('click', nextPage);
