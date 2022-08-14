@@ -10,10 +10,16 @@ class db_handler:
         )
 
         self.read_template = '''\
-SELECT {0} FROM booking_info WHERE {1}=?;'''
+SELECT {0} FROM vehicle_info WHERE {1}=?;'''
 
 
     def filled(self, id : int) -> bool:
-        print(self.read_template.format('*', 'booking_id'))
+        cursor = self.db_conn.cursor()
+        item = cursor.execute(self.read_template.format('*', 'booking_id'), id).fetchone()
+        return item != None
 
-db_handler().filled(1)
+    
+    def write_admin_packet():
+        pass
+
+# print(db_handler().filled(1))
