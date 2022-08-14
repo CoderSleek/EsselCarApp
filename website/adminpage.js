@@ -100,37 +100,44 @@ function createNewInfoModal(){
         <button type="button" class="close-btn" id="close-btn">X</button>
         <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${booking_id}</span>
         <div class="eachrow">
-            <span class="heading">Vehicle Registration Number: </span>
-            <input id="vehRegNum" type="text">
-            <span class="errorMsg">zzzzzzzzzzzzzzzzzzzzzz</span>
+            <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" type="text">
+            <span class="errorMsg hide"></span>
         </div>
         <div class="eachrow">
             <span class="heading">Vehicle Model: </span><input id="vehModel">
-            <div class="errorMsg"></div>
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">License Expiry Date: </span><input id="licenseExp" type="date">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">Insurance Expiry Date: </span><input id="insuranceExp" type="date">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">PUC Expiry Date: </span><input id="pucExp" type="date">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">Driver Name: </span><input id="driverName">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">Driver Address: </span><input id="driverAddress">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">License Number: </span><input id="licenseNumber">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
             <span class="heading">Driver Contact Information: </span><input id="driverContact" type="tel">
+            <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
-            <span class="heading">Travel Agent Contact: </span><input id="travContact" type="tel">
+            <span class="heading">Travel Agent Contact**: </span><input id="travContact" type="tel">
+            <div class="errorMsg hide"></div>
         </div>
         <button type="button" id="submit" class="btn-class" style="left:50%; transform: translate(-50%); margin-top: 18px;">Submit</button>
         `
@@ -158,13 +165,12 @@ function sendInfo(){
         "travContact": document.getElementById("travContact").value
     }
 
-    validatePacket(packet);
-    
+    if(!validatePacket(packet)){
+        return;
+    }
     // const res = fetch(BACKEND_URL, {method:'post', headers:{headers: {'Content-Type':'application/json'}},
     // body: JSON.stringify(packet)})
-
-    const res = true;
-
+    let res = true;
     if(res){
         const x = data.findIndex((element) => 
         {return element.bookingID === parseInt(idNumber)})
@@ -173,13 +179,87 @@ function sendInfo(){
         view_btn.textContent = 'View Vehicle Information';
         view_btn.removeEventListener('click', createNewInfoModal, true);
         view_btn.addEventListener('click', createViewInfoModal);
+        togglemodal();
     }
 }
 
-function validatePacket(){
-    const bool_return = true;
+function validatePacket(packet){
+    let bool_return = {'item':true};
+
+    // let error_element;
+    // const alpha_only = new RegExp("^[A-Za-z]+[A-Za-z ]*$");
+    // const alpha_num = new RegExp("^[A-Za-z0-9]+[A-Za-z0-9 ]*$");
+    // const vehicle_number = new RegExp("^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$");
+    // const number_only = new RegExp('^[0-9]{10}$');
+
+    // if(!vehicle_number.test(packet.vehRegNum)){
+    //     error_element = document.getElementById('vehRegNum').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Enter a Valid Vehicle Plate Number');
+    // }
+    // if(!alpha_only.test(packet.vehModel)){
+    //     error_element = document.getElementById('vehModel').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Only letter and space allowed');
+    // }
+    // if(!alpha_only.test(packet.driverName)){
+    //     error_element = document.getElementById('driverName').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Only letter and space allowed');
+    // }
+    // if(!alpha_num.test(packet.driverAddress)){
+    //     error_element = document.getElementById('driverAddress').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Only letter, digit and space allowed');
+    // }
+    // if(!RegExp('^[A-Za-z]{2}[ -]*[0-9]{2}[ -]*[0-9]+$').test(packet.licenseNumber)){
+    //     error_element = document.getElementById('licenseNumber').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Enter valid license number');
+    // }
+    // if(!number_only.test(packet.driverContact)){
+    //     error_element = document.getElementById('driverContact').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Enter valid Phone number');
+    // }
+    // if(!RegExp('^[0-9]{10}*$').test(packet.travContact)){
+    //     error_element = document.getElementById('travContact').nextElementSibling;
+    //     set_error_msg(error_element, bool_return, 'Enter valid Phone number');
+    // }
+
+    if(packet.vehRegNum.length == 0){
+        set_error_msg(document.getElementById('vehRegNum').nextElementSibling, bool_return);
+    }
+    if(packet.vehModel.length == 0){
+        set_error_msg(document.getElementById('vehModel').nextElementSibling, bool_return);
+    }
+    if(packet.licenseExp.length == 0){
+        set_error_msg(document.getElementById('licenseExp').nextElementSibling, bool_return);
+    }
+    if(packet.insuranceExp.length == 0){
+        set_error_msg(document.getElementById('insuranceExp').nextElementSibling, bool_return);
+    }
+    if(packet.pucExp.length == 0){
+        set_error_msg(document.getElementById('pucExp').nextElementSibling, bool_return);
+    }
+    if(packet.driverName.length == 0){
+        set_error_msg(document.getElementById('driverName').nextElementSibling, bool_return);
+    }
+    if(packet.driverAddress.length == 0){
+        set_error_msg(document.getElementById('driverAddress').nextElementSibling, bool_return);
+    }
+    if(packet.licenseNumber.length == 0){
+        set_error_msg(document.getElementById('licenseNumber').nextElementSibling, bool_return);
+    }
+    if(packet.driverContact.length == 0){
+        set_error_msg(document.getElementById('driverContact').nextElementSibling, bool_return);
+    }
+    if(packet.travContact.length == 0){
+        set_error_msg(document.getElementById('travContact').nextElementSibling, bool_return);
+    }
+
+    return bool_return.item;
 }
 
+function set_error_msg(error_element, bool_return, error_msg = 'Cannot be empty'){
+    error_element.textContent = error_msg;
+    error_element.classList.toggle('hide');
+    bool_return.item = false;
+}
 function togglemodal(){
     document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');

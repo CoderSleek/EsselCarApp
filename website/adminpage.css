@@ -50,7 +50,7 @@ body{
     /* padding: 100px; */
     display: block;
     height: 60%;
-    width: 80vw;
+    width: 60vw;
     border: 1px solid black;
     overflow-y: auto;
 }
@@ -125,9 +125,11 @@ body{
     position: absolute;
     /* height: 60%; */
     height: fit-content;
-    width: 100%;
-    /* width: fit-content; */
+    /* width: 100%; */
+    /* width: max-content; */
     /* background-color: brown; */
+    min-width: 40%;
+    max-width: fit-content;
     background-color: whitesmoke;
     border: 1px solid gray;
     border-radius: 11px;
@@ -155,21 +157,23 @@ body{
 }
 
 .modal input{
-    float: right;
+    /* float: right; */
     margin-right: 5%;
     border-radius: 6px;
     /* border: 1px solid black; */
 }
 
 .eachrow{
-    /* display: flex; */
+    display: flex;
+    justify-content: space-between;
     width: 100%;
-    display: block;
+    /* display: block; */
     white-space: nowrap;
     text-overflow: clip;
 }
 .errorMsg{
-    float: right !important;
-    margin-right: 0%;
+    /* float: right !important; */
+    /* margin-right: 0%; */
     color: red;
+    font-size: 11px;
 }
