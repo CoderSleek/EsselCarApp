@@ -42,8 +42,8 @@ class AdminLoginRequest(BaseModel):
     password: str
 
 
-class PageNumber(BaseModel):
-    num: int
+class VehicleInfoPacket(BaseModel):
+    booking_id: int
     regNum: str
     model: str
     licenseExpDate: datetime.date
@@ -56,9 +56,8 @@ class PageNumber(BaseModel):
     travAgentContact: int
 
 
-class VehicleInfoPacket(BaseModel):
-    booking_id: int
-
+class PageNumber(BaseModel):
+    num: int
 
 
 app = FastAPI()
@@ -238,8 +237,10 @@ async def getreq(page : PageNumber):
 @app.post('/newvehicleinfo')
 def vehInfo(req: VehicleInfoPacket):
     try:
-        db
+        db_veh_info().write_admin_packet()
+        return None
     except:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 if __name__ == '__main__':

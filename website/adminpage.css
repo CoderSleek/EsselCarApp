@@ -125,7 +125,8 @@ body{
     position: absolute;
     /* height: 60%; */
     height: fit-content;
-    width: 40%;
+    width: 100%;
+    /* width: fit-content; */
     /* background-color: brown; */
     background-color: whitesmoke;
     border: 1px solid gray;
@@ -158,4 +159,17 @@ body{
     margin-right: 5%;
     border-radius: 6px;
     /* border: 1px solid black; */
+}
+
+.eachrow{
+    /* display: flex; */
+    width: 100%;
+    display: block;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+.errorMsg{
+    float: right !important;
+    margin-right: 0%;
+    color: red;
 }

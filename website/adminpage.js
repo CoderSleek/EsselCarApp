@@ -99,9 +99,14 @@ function createNewInfoModal(){
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
         <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${booking_id}</span>
-        <div class="eachrow"><span class="heading">Vehicle Registration Number: </span><input id="vehRegNum"></div>
+        <div class="eachrow">
+            <span class="heading">Vehicle Registration Number: </span>
+            <input id="vehRegNum" type="text">
+            <span class="errorMsg">zzzzzzzzzzzzzzzzzzzzzz</span>
+        </div>
         <div class="eachrow">
             <span class="heading">Vehicle Model: </span><input id="vehModel">
+            <div class="errorMsg"></div>
         </div>
         <div class="eachrow">
             <span class="heading">License Expiry Date: </span><input id="licenseExp" type="date">
@@ -152,6 +157,8 @@ function sendInfo(){
         "driverContact": document.getElementById("driverContact").value,
         "travContact": document.getElementById("travContact").value
     }
+
+    validatePacket(packet);
     
     // const res = fetch(BACKEND_URL, {method:'post', headers:{headers: {'Content-Type':'application/json'}},
     // body: JSON.stringify(packet)})
@@ -167,6 +174,10 @@ function sendInfo(){
         view_btn.removeEventListener('click', createNewInfoModal, true);
         view_btn.addEventListener('click', createViewInfoModal);
     }
+}
+
+function validatePacket(){
+    const bool_return = true;
 }
 
 function togglemodal(){
