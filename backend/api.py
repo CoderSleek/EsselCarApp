@@ -12,10 +12,10 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
-from vehicle_handler import db_handler as db_veh_info
-# from fake_db import db_emp_det, db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+# from vehicle_handler import db_handler as db_veh_info
+from fake_db import db_emp_det, db_book_inf
 
 import json
 import datetime
@@ -43,17 +43,17 @@ class AdminLoginRequest(BaseModel):
 
 
 class VehicleInfoPacket(BaseModel):
-    booking_id: int
-    regNum: str
-    model: str
+    bookingId: int
+    vehRegNum: str
+    vehModel: str
     licenseExpDate: datetime.date
     insuranceExpDate: datetime.date
     pucExpDate: datetime.date
     driverName: str
-    address: str
+    driverAddress: str
     licenseNum: str
     driverContact: int
-    travAgentContact: int
+    travAgentContact: Optional[int | None]
 
 
 class PageNumber(BaseModel):
@@ -236,11 +236,12 @@ async def getreq(page : PageNumber):
 
 @app.post('/newvehicleinfo')
 def vehInfo(req: VehicleInfoPacket):
-    try:
-        db_veh_info().write_admin_packet()
-        return None
-    except:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    print(req)
+    # try:
+    #     db_veh_info().write_admin_packet()
+    #     return None
+    # except:
+    #     response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 if __name__ == '__main__':

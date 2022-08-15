@@ -92,6 +92,7 @@ function display_data(){
 }
 
 function createNewInfoModal(){
+    toggle_btns(true);
     booking_id = event.target.parentNode.parentNode.id;
     booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
 
@@ -142,12 +143,12 @@ function createNewInfoModal(){
         <button type="button" id="submit" class="btn-class" style="left:50%; transform: translate(-50%); margin-top: 18px;">Submit</button>
         `
         modal.innerHTML = modalHtml;
-        modal.querySelector('.close-btn').addEventListener('click', togglemodal);
         togglemodal();
-        modal.querySelector('#submit').addEventListener('click', sendInfo);
+        modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(), toggle_btns(false)});
+        modal.querySelector('#submit').addEventListener('click', ()=>{sendInfo(), toggle_btns(false)});
 }
 
-function sendInfo(){
+async function sendInfo(){
         const idString = event.target.parentNode.children[1].textContent;
         const idNumber = idString.match(new RegExp("\\d+$"))[0];
 
@@ -155,23 +156,29 @@ function sendInfo(){
         "bookingId": idNumber,
         "vehRegNum": document.getElementById("vehRegNum").value,
         "vehModel": document.getElementById("vehModel").value,
-        "licenseExp": document.getElementById("licenseExp").value,
-        "insuranceExp": document.getElementById("insuranceExp").value,
-        "pucExp": document.getElementById("pucExp").value,
+        "licenseExpDate": document.getElementById("licenseExp").value,
+        "insuranceExpDate": document.getElementById("insuranceExp").value,
+        "pucExpDate": document.getElementById("pucExp").value,
         "driverName": document.getElementById("driverName").value,
         "driverAddress": document.getElementById("driverAddress").value,
-        "licenseNumber": document.getElementById("licenseNumber").value,
+        "licenseNum": document.getElementById("licenseNumber").value,
         "driverContact": document.getElementById("driverContact").value,
-        "travContact": document.getElementById("travContact").value
+        "travAgentContact": document.getElementById("travContact").value
     }
 
     if(!validatePacket(packet)){
         return;
     }
-    // const res = fetch(BACKEND_URL, {method:'post', headers:{headers: {'Content-Type':'application/json'}},
-    // body: JSON.stringify(packet)})
-    let res = true;
-    if(res){
+    // console.log(packet);
+    if(packet.travAgentContact == ""){
+        packet.travAgentContact = null;
+    }
+    const res = await fetch(BACKEND_URL+'newvehicleinfo', {method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(packet)});
+
+    if(res.status == 200){
+        console.log('inside changer');
         const x = data.findIndex((element) => 
         {return element.bookingID === parseInt(idNumber)})
         data[x].hasInfoFilled = true;
@@ -185,41 +192,43 @@ function sendInfo(){
 
 function validatePacket(packet){
     let bool_return = {'item':true};
+    resetInputErrorMsg();
+    let error_element;
+    const alpha_only = new RegExp("^[A-Za-z]+[A-Za-z ]*$");
+    const alpha_num = new RegExp("^[A-Za-z0-9]+[A-Za-z0-9 ]*$");
+    // const vehicle_number = new RegExp("^[A-Z]{2}[ -]*[0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$");
+    // const vehicle_number = new RegExp('^[A-Za-z]{2}[ -]?[0-9]{1,2}[A-Za-z]{1}[ -]?[0-9]{4}$');
+    const special = new RegExp("[A-Z]{2}[ 0-9A-Z-]{3,}[0-9]{4}$");
+    const number_only = new RegExp('^[0-9]{10}$');
 
-    // let error_element;
-    // const alpha_only = new RegExp("^[A-Za-z]+[A-Za-z ]*$");
-    // const alpha_num = new RegExp("^[A-Za-z0-9]+[A-Za-z0-9 ]*$");
-    // const vehicle_number = new RegExp("^[A-Z]{2}[ -][0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$");
-    // const number_only = new RegExp('^[0-9]{10}$');
-
-    // if(!vehicle_number.test(packet.vehRegNum)){
-    //     error_element = document.getElementById('vehRegNum').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Enter a Valid Vehicle Plate Number');
-    // }
-    // if(!alpha_only.test(packet.vehModel)){
-    //     error_element = document.getElementById('vehModel').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Only letter and space allowed');
-    // }
-    // if(!alpha_only.test(packet.driverName)){
-    //     error_element = document.getElementById('driverName').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Only letter and space allowed');
-    // }
-    // if(!alpha_num.test(packet.driverAddress)){
-    //     error_element = document.getElementById('driverAddress').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Only letter, digit and space allowed');
-    // }
-    // if(!RegExp('^[A-Za-z]{2}[ -]*[0-9]{2}[ -]*[0-9]+$').test(packet.licenseNumber)){
-    //     error_element = document.getElementById('licenseNumber').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Enter valid license number');
-    // }
-    // if(!number_only.test(packet.driverContact)){
-    //     error_element = document.getElementById('driverContact').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Enter valid Phone number');
-    // }
-    // if(!RegExp('^[0-9]{10}*$').test(packet.travContact)){
-    //     error_element = document.getElementById('travContact').nextElementSibling;
-    //     set_error_msg(error_element, bool_return, 'Enter valid Phone number');
-    // }
+    if(!special.test(packet.vehRegNum)){
+        error_element = document.getElementById('vehRegNum').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Enter a Valid Vehicle Plate Number');
+    }
+    if(!alpha_only.test(packet.vehModel)){
+        error_element = document.getElementById('vehModel').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Only letter and space allowed');
+    }
+    if(!alpha_only.test(packet.driverName)){
+        error_element = document.getElementById('driverName').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Only letter and space allowed');
+    }
+    if(!alpha_num.test(packet.driverAddress)){
+        error_element = document.getElementById('driverAddress').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Only letter, digit and space allowed');
+    }
+    if(!RegExp('^[A-Za-z]{2}[ -]*[0-9]{2}[ -]*[0-9]+$').test(packet.licenseNum)){
+        error_element = document.getElementById('licenseNumber').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Enter valid license number');
+    }
+    if(!number_only.test(packet.driverContact)){
+        error_element = document.getElementById('driverContact').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Enter valid Phone number');
+    }
+    if(!RegExp('^(?:\\d{10}|)$').test(packet.travAgentContact)){
+        error_element = document.getElementById('travContact').nextElementSibling;
+        set_error_msg(error_element, bool_return, 'Enter valid Phone number');
+    }
 
     if(packet.vehRegNum.length == 0){
         set_error_msg(document.getElementById('vehRegNum').nextElementSibling, bool_return);
@@ -227,13 +236,13 @@ function validatePacket(packet){
     if(packet.vehModel.length == 0){
         set_error_msg(document.getElementById('vehModel').nextElementSibling, bool_return);
     }
-    if(packet.licenseExp.length == 0){
+    if(packet.licenseExpDate.length == 0){
         set_error_msg(document.getElementById('licenseExp').nextElementSibling, bool_return);
     }
-    if(packet.insuranceExp.length == 0){
+    if(packet.insuranceExpDate.length == 0){
         set_error_msg(document.getElementById('insuranceExp').nextElementSibling, bool_return);
     }
-    if(packet.pucExp.length == 0){
+    if(packet.pucExpDate.length == 0){
         set_error_msg(document.getElementById('pucExp').nextElementSibling, bool_return);
     }
     if(packet.driverName.length == 0){
@@ -242,14 +251,11 @@ function validatePacket(packet){
     if(packet.driverAddress.length == 0){
         set_error_msg(document.getElementById('driverAddress').nextElementSibling, bool_return);
     }
-    if(packet.licenseNumber.length == 0){
+    if(packet.licenseNum.length == 0){
         set_error_msg(document.getElementById('licenseNumber').nextElementSibling, bool_return);
     }
     if(packet.driverContact.length == 0){
         set_error_msg(document.getElementById('driverContact').nextElementSibling, bool_return);
-    }
-    if(packet.travContact.length == 0){
-        set_error_msg(document.getElementById('travContact').nextElementSibling, bool_return);
     }
 
     return bool_return.item;
@@ -257,16 +263,22 @@ function validatePacket(packet){
 
 function set_error_msg(error_element, bool_return, error_msg = 'Cannot be empty'){
     error_element.textContent = error_msg;
-    error_element.classList.toggle('hide');
+    error_element.classList.remove('hide');
     bool_return.item = false;
 }
 function togglemodal(){
     document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');
-    // document.body.childNodes.disabled = true;
 }
 
+function toggle_btns(status){
+    const btn_list = Array.from(document.getElementsByTagName('button'));
+    btn_list.forEach((element)=>{
+        element.disabled = status;
+    })
+}
 function createViewInfoModal(){
+    toggle_btns(true);
     let booking_id = event.target.parentNode.parentNode.id;
     booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
 
@@ -320,8 +332,8 @@ function createViewInfoModal(){
         `;
 
         modal.innerHTML = modalHtml;
-        modal.querySelector('.close-btn').addEventListener('click', togglemodal);
         togglemodal();
+        modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(), toggle_btns(false)});
 }
 
 function assigneventlistener(){
@@ -369,6 +381,17 @@ function initializePage(){
     assignPageNumber();
 }
 
+function resetInputErrorMsg(){
+    const item_list = document.querySelectorAll('.eachrow');
+
+    // if(item_list[0].lastElementChild.classList.contains('hide')) return;
+
+    item_list.forEach((element)=>{
+        element.lastElementChild.classList.add('hide');
+    })
+}
+
 initializePage();
+// createNewInfoModal();
 document.getElementById('prev_page').addEventListener('click', prevPage);
 document.getElementById('next_page').addEventListener('click', nextPage);
