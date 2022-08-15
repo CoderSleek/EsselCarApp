@@ -4,22 +4,22 @@ let data = [];
 
 async function get_data(){
     data = [];
-    data = [
-        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":false},
-        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":true},
-        {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022", "hasInfoFilled":false}
-    ]
-    // try{
-    //     response = await fetch(BACKEND_URL + 'getbookingrequests',
-    //     {method: 'POST',
-    //     headers: {'Content-Type':'application/json'},
-    //     body: JSON.stringify({"num":page_number}),
-    //     });
+    // data = [
+    //     {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":false},
+    //     {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":true},
+    //     {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022", "hasInfoFilled":false}
+    // ]
+    try{
+        response = await fetch(BACKEND_URL + 'getbookingrequests',
+        {method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({"num":page_number}),
+        });
 
-    //     data = await response.json();
-    // } catch (err) {
-    //     alert('Connectivity Issue');
-    // }
+        data = await response.json();
+    } catch (err) {
+        alert('Connectivity Issue');
+    }
 
     if(data.length == 0 || data === undefined || data === null){
         window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
@@ -101,11 +101,11 @@ function createNewInfoModal(){
         <button type="button" class="close-btn" id="close-btn">X</button>
         <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${booking_id}</span>
         <div class="eachrow">
-            <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" type="text">
+            <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" type="text" maxlength=50>
             <span class="errorMsg hide"></span>
         </div>
         <div class="eachrow">
-            <span class="heading">Vehicle Model: </span><input id="vehModel">
+            <span class="heading">Vehicle Model: </span><input id="vehModel" maxlength=100>
             <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
@@ -121,15 +121,15 @@ function createNewInfoModal(){
             <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
-            <span class="heading">Driver Name: </span><input id="driverName">
+            <span class="heading">Driver Name: </span><input id="driverName" maxlength=50>
             <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
-            <span class="heading">Driver Address: </span><input id="driverAddress">
+            <span class="heading">Driver Address: </span><input id="driverAddress" maxlength=200>
             <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
-            <span class="heading">License Number: </span><input id="licenseNumber">
+            <span class="heading">License Number: </span><input id="licenseNumber" maxlength=50>
             <div class="errorMsg hide"></div>
         </div>
         <div class="eachrow">
@@ -145,7 +145,7 @@ function createNewInfoModal(){
         modal.innerHTML = modalHtml;
         togglemodal();
         modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(), toggle_btns(false)});
-        modal.querySelector('#submit').addEventListener('click', ()=>{sendInfo(), toggle_btns(false)});
+        modal.querySelector('#submit').addEventListener('click', sendInfo);
 }
 
 async function sendInfo(){
@@ -153,7 +153,7 @@ async function sendInfo(){
         const idNumber = idString.match(new RegExp("\\d+$"))[0];
 
         const packet = {
-        "bookingId": idNumber,
+        "bookingID": idNumber,
         "vehRegNum": document.getElementById("vehRegNum").value,
         "vehModel": document.getElementById("vehModel").value,
         "licenseExpDate": document.getElementById("licenseExp").value,
@@ -161,15 +161,15 @@ async function sendInfo(){
         "pucExpDate": document.getElementById("pucExp").value,
         "driverName": document.getElementById("driverName").value,
         "driverAddress": document.getElementById("driverAddress").value,
-        "licenseNum": document.getElementById("licenseNumber").value,
         "driverContact": document.getElementById("driverContact").value,
+        "licenseNum": document.getElementById("licenseNumber").value,
         "travAgentContact": document.getElementById("travContact").value
     }
 
     if(!validatePacket(packet)){
         return;
     }
-    // console.log(packet);
+
     if(packet.travAgentContact == ""){
         packet.travAgentContact = null;
     }
@@ -177,6 +177,7 @@ async function sendInfo(){
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify(packet)});
 
+    
     if(res.status == 200){
         console.log('inside changer');
         const x = data.findIndex((element) => 
@@ -186,7 +187,10 @@ async function sendInfo(){
         view_btn.textContent = 'View Vehicle Information';
         view_btn.removeEventListener('click', createNewInfoModal, true);
         view_btn.addEventListener('click', createViewInfoModal);
+        toggle_btns(false);
         togglemodal();
+    } else {
+        alert('error');
     }
 }
 
@@ -266,6 +270,7 @@ function set_error_msg(error_element, bool_return, error_msg = 'Cannot be empty'
     error_element.classList.remove('hide');
     bool_return.item = false;
 }
+
 function togglemodal(){
     document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');
@@ -277,12 +282,18 @@ function toggle_btns(status){
         element.disabled = status;
     })
 }
-function createViewInfoModal(){
+
+async function createViewInfoModal(){
     toggle_btns(true);
     let booking_id = event.target.parentNode.parentNode.id;
     booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
 
-    let element_data = fetch();
+    let element_data = await fetch(BACKEND_URL+'getvehicleinfo',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({'bookingID':booking_id})
+    });  
+    element_data = await element_data.json()
+
     const modal = document.getElementById('modal');
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
@@ -294,13 +305,13 @@ function createViewInfoModal(){
             <span class="heading">Vehicle Model: </span><input id="vehModel" disabled value="${element_data.vehModel}">
         </div>
         <div class="eachrow">
-            <span class="heading">License Expiry Date: </span><input id="licenseExp" disabled value="${element_data.licenseExp}">
+            <span class="heading">License Expiry Date: </span><input id="licenseExp" disabled value="${element_data.licenseExpDate}">
         </div>
         <div class="eachrow">
-            <span class="heading">Insurance Expiry Date: </span><input id="insuranceExp" disabled value="${element_data.insuranceExp}">
+            <span class="heading">Insurance Expiry Date: </span><input id="insuranceExp" disabled value="${element_data.insuranceExpDate}">
         </div>
         <div class="eachrow">
-            <span class="heading">PUC Expiry Date: </span><input id="pucExp" disabled value="${element_data.pucExp}">
+            <span class="heading">PUC Expiry Date: </span><input id="pucExp" disabled value="${element_data.pucExpDate}">
         </div>
         <div class="eachrow">
             <span class="heading">Driver Name: </span><input id="driverName" disabled value="${element_data.driverName}">
@@ -309,13 +320,13 @@ function createViewInfoModal(){
             <span class="heading">Driver Address: </span><input id="driverAddress" disabled value="${element_data.driverAddress}">
         </div>
         <div class="eachrow">
-            <span class="heading">License Number: </span><input id="licenseNumber" disabled value="${element_data.licenseNumber}">
+            <span class="heading">License Number: </span><input id="licenseNumber" disabled value="${element_data.licenseNum}">
         </div>
         <div class="eachrow">
             <span class="heading">Driver Contact Information: </span><input id="driverContact" type="tel" disabled value="${element_data.driverContact}">
         </div>
         <div class="eachrow">
-            <span class="heading">Travel Agent Contact: </span><input id="travContact" type="tel" disabled value="${element_data.travContact}">
+            <span class="heading">Travel Agent Contact: </span><input id="travContact" type="tel" disabled value="${element_data.travAgentContact ?? 'Not Provided'}">
         </div>
         <div class="eachrow">
             <span class="heading">In Distance: </span><input disabled value="${element_data.inDist ?? 'Not Updated'}">
@@ -392,6 +403,5 @@ function resetInputErrorMsg(){
 }
 
 initializePage();
-// createNewInfoModal();
 document.getElementById('prev_page').addEventListener('click', prevPage);
 document.getElementById('next_page').addEventListener('click', nextPage);

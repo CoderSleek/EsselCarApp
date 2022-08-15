@@ -21,6 +21,7 @@ class db_handler:
         "Database=VehicleAPP;"
         "Trusted_Connection=yes;"
         )
+
         self.write_template = "INSERT INTO \
 booking_info(booking_id, emp_id, trav_purpose, expected_dist, pickup_date_time, \
 pickup_venue, arrival_date_time, additional_info, mng_id, request_date_time) \
@@ -65,5 +66,9 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
     def get_rows(self):
         cursor = self.db_conn.cursor()
         return cursor.execute("SELECT * FROM booking_info ORDER BY request_date_time DESC;")
-# new = db_handler()
-# new.read()
+
+
+    def get_approval_status(self, bid: int) -> bool:
+        cursor = self.db_conn.cursor()
+        isApproved = cursor.execute('SELECT approval_status FROM booking_info WHERE booking_id=?', bid).fetchone()
+        return isApproved[0] == True

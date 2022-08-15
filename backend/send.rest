@@ -63,15 +63,24 @@ POST http://localhost:5000/newvehicleinfo
 Content-Type: application/json
 
 {
-        "bookingId": 1,
+        "bookingID": 1,
         "vehRegNum": "abc",
         "vehModel": "some car",
-        "licenseExpDate": "12/09/2022",
-        "insuranceExpDate": "12/09/2022",
-        "pucExpDate": "12/09/2022",
+        "licenseExpDate": "2022-09-12",
+        "insuranceExpDate": "2022-09-12",
+        "pucExpDate": "2022-09-12",
         "driverName": "rohan",
         "driverAddress": "malabaar",
         "licenseNum": "some string",
         "driverContact": 8342023433,
         "travAgentContact": null
 }
+
+
+###
+
+
+POST http://127.0.0.1:5000/getvehicleinfo
+Content-Type: application/json
+
+{"bookingID":1}

@@ -12,13 +12,13 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
-# from vehicle_handler import db_handler as db_veh_info
-from fake_db import db_emp_det, db_book_inf
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
+from vehicle_handler import db_handler as db_veh_info
+# from fake_db import db_emp_det, db_book_inf
 
 import json
-import datetime
+from datetime import datetime, date
 import re
 
 class LoginRequest(BaseModel):
@@ -43,21 +43,29 @@ class AdminLoginRequest(BaseModel):
 
 
 class VehicleInfoPacket(BaseModel):
-    bookingId: int
+    bookingID: int
     vehRegNum: str
     vehModel: str
-    licenseExpDate: datetime.date
-    insuranceExpDate: datetime.date
-    pucExpDate: datetime.date
+    licenseExpDate: date
+    insuranceExpDate: date
+    pucExpDate: date
     driverName: str
     driverAddress: str
-    licenseNum: str
     driverContact: int
+    licenseNum: str
     travAgentContact: Optional[int | None]
 
 
 class PageNumber(BaseModel):
     num: int
+
+
+class tokenType(BaseModel):
+    token: str
+
+
+class vehicleInfo(BaseModel):
+    bookingID: int
 
 
 app = FastAPI()
@@ -81,12 +89,12 @@ templates = Jinja2Templates(
 
 
 @app.get('/')
-def route():
+def defaultRoute():
     return "server functional"
 
 
-@app.post('/login')
-def home(req: LoginRequest, response : Response):
+@app.post('/login', tags=['Employee'])
+def employeeLogin(req: LoginRequest, response : Response):
     try:
         db = db_emp_det()
         row = db.read(req.uid) # gets a single row as a named tuple from db
@@ -110,8 +118,8 @@ def home(req: LoginRequest, response : Response):
         return "Internal Server Error"
 
 
-@app.post('/newbooking')
-def newbooking(req: NewBooking):
+@app.post('/newbooking', tags=['Employee'])
+def createNewbooking(req: NewBooking, response: Response):
     # x = x.split(',  ')
     # x.reverse()
     # x = ' '.join(x)
@@ -126,7 +134,7 @@ def newbooking(req: NewBooking):
         # temp = re.findall('^([\d]+-\d\d-\d\d).(\d\d:\d\d)', req.reqDateTime)
         # req.reqDateTime = ' '.join(temp[0])
         # temp = re.findall('^([\d]+)-(\d\d)-(\d\d).*(\d\d):(\d\d):(\d\d)', str(datetime.datetime.now()))
-        req.reqDateTime = str(datetime.datetime.now()).split('.')[0]
+        req.reqDateTime = str(datetime.now()).split('.')[0]
     except:
         response.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return "Bad Request"
@@ -138,8 +146,8 @@ def newbooking(req: NewBooking):
         return "Internal Server Error"
 
 
-@app.put('/approval/{bid}/{val}')
-def setstatus(val: bool, bid: int):
+@app.put('/approval/{bid}/{val}', tags=['Employee'])
+def setResponseStatus(val: bool, bid: int, response: Response):
     try:
         db_book_inf().set_approval_status(val, bid)
     except:
@@ -147,8 +155,8 @@ def setstatus(val: bool, bid: int):
         return "Internal Server Error"
 
 
-@app.get('/history/{uid}')
-def history(uid : int) -> list:
+@app.get('/history/{uid}', tags=['Employee'])
+def retrieveUserHistories(uid : int, response: Response) -> list:
     try:
         rows_list = db_book_inf().read(uid)
         json_list = []
@@ -169,38 +177,35 @@ def history(uid : int) -> list:
         return "Internal Server Error"
 
 
-@app.post('/admincredcheck')
-def adm_login(req: AdminLoginRequest) -> str:
+@app.post('/admincredcheck', tags=['Admin'])
+def adminCredentialValidation(req: AdminLoginRequest) -> str:
     if req.uname == 'admin' and req.password == 'admin':
         return jwt.signJWT(req.uname, req.password)
 
-class tokenType(BaseModel):
-    token: str
 
-@app.get('/adminpage')
-def page(token : tokenType, request: Request):
+@app.get('/adminpage', tags=['Admin'])
+def adminContentPage(token : tokenType, request: Request):
     # return templates.TemplateResponse("index.html", {"request":request})
-    print(token.token)
-    # try:
-    #     package = jwt.decodeJWT(token)
-    #     if package['userName'] == 'admin' and package['password'] == 'admin':
-    #         print('inside if')
-    #         return templates.TemplateResponse("adminpage.html", {"request":request})
-    #     else:
-    #         print('inside else')
-    #         return templates.TemplateResponse("error.html", {"request": request})
-    # except err:
-    #     print('inside except', err)
-    #     return templates.TemplateResponse("error.html", {"request": request})
+    # print(token.token)
+    try:
+        package = jwt.decodeJWT(token)
+        if package['userName'] == 'admin' and package['password'] == 'admin':
+            return templates.TemplateResponse("adminpage.html", {"request":request})
+        else:
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return templates.TemplateResponse("error.html", {"request": request})
+    except err:
+        response.status_code = status.HTTP_403_FORBIDDEN
+        return templates.TemplateResponse("error.html", {"request": request})
     
 
-@app.get('/adminlogin')
-def adm(request: Request):
+@app.get('/adminlogin', tags=['Admin'])
+def adminLoginPage(request: Request):
     return templates.TemplateResponse("admin.html", {"request":request})
 
 
-@app.post('/getbookingrequests')
-async def getreq(page : PageNumber):
+@app.post('/getbookingrequests', tags=['Admin'])
+def retrieveBookingRequests(page : PageNumber):
 
     row_list = list
     db_rows = db_book_inf().get_rows()
@@ -229,21 +234,77 @@ async def getreq(page : PageNumber):
             'mngID': row_list[i].mng_id,
             'isApproved': row_list[i].approval_status,
             'requestDateTime': requestDateTime,
-            'hasInfoFilled': db_veh_info().filled()
+            'hasInfoFilled': db_veh_info().filled(row_list[i].booking_id)
         }
         
     return row_list
 
-@app.post('/newvehicleinfo')
-def vehInfo(req: VehicleInfoPacket):
-    print(req)
-    # try:
-    #     db_veh_info().write_admin_packet()
-    #     return None
-    # except:
-    #     response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+@app.post('/newvehicleinfo', tags=['Admin'])
+def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
+    if not validate_packet([x for x in list(req.__dict__.values()) if not isinstance(x, date)]):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return
+
+    print('after if')
+    try:
+        pass
+        # db_veh_info().write_admin_packet(req)
+    except Exception as e:
+        print(e)
+        # response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@app.post('/getvehicleinfo', tags=['Admin'])
+async def retrieveVehicleData(req: vehicleInfo, response: Response):
+    try:
+        vehicle_info = db_veh_info().get_single_booking(req.bookingID)
+
+        if vehicle_info == None:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return "Bad Request"
+
+        
+        return_token = {
+            'bookingID': vehicle_info.booking_id,
+            'vehRegNum': vehicle_info.veh_reg_num,
+            'vehModel': vehicle_info.veh_model,
+            'licenseExpDate': vehicle_info.license_expiry,
+            'insuranceExpDate': vehicle_info.insurance_validity,
+            'pucExpDate': vehicle_info.puc_expiry,
+            'driverName': vehicle_info.driver_name,
+            'driverAddress': vehicle_info.driver_contact,
+            'driverContact': vehicle_info.driver_address,
+            'licenseNum': vehicle_info.license_num,
+            'travAgentContact': vehicle_info.trav_agent_contact,
+            'inDist': vehicle_info.start_dist,
+            'outDist': vehicle_info.end_dist,
+            'inTime': vehicle_info.in_time,
+            'outTime': vehicle_info.out_time,
+        }
+        return return_token
+    except Exception as e:
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+def validate_packet(req):
+    special_char_regex = re.compile('^[A-Za-z0-9 -]*$')
+    list_of_char_limits = [50, 100, 50, 200, 50, 10, 10]
+
+    if not db_book_inf().get_approval_status(req[0]):
+        return False
+
+    for index in range(1, len(req)-2):
+        if len(req[index]) == 0 or (not special_char_regex.match(req[index])) or (
+            list_of_char_limits[index] < len(req[index])):
+            return False
+    
+    for index in range(len(req)-2,len(req)):
+        if (not (isinstance(req[index], int) and len(str(req[index])) == 10)) and (req[index] is not None):
+            return False
+
+    return True
 
 
 if __name__ == '__main__':
     run(app, port=5000)
-    # getreq(1)

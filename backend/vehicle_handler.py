@@ -1,19 +1,19 @@
 import pyodbc
 from pydantic import BaseModel
-
+from datetime import date
 
 class VehicleInfoPacket(BaseModel):
-    booking_id: int
-    regNum: str
+    bookingID: int
+    vehRegNum: str
     model: str
-    licenseExpDate: datetime.date
-    insuranceExpDate: datetime.date
-    pucExpDate: datetime.date
+    licenseExpDate: date
+    insuranceExpDate: date
+    pucExpDate: date
     driverName: str
-    address: str
-    licenseNum: str
+    driverAddress: str
     driverContact: int
-    travAgentContact: int
+    licenseNum: str
+    travAgentContact: int or None
 
 
 class db_handler:
@@ -29,7 +29,12 @@ class db_handler:
 SELECT {0} FROM vehicle_info WHERE {1}=?;'''
 
         self.write_template = '''\
-INSERT INTO vehicle_info values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+INSERT INTO vehicle_info (booking_id, veh_reg_num, veh_model, insurance_validity, puc_expiry,\
+ driver_name, driver_address, driver_contact, license_expiry, license_num, trav_agent_contact)\
+ values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
+
+        self.read_template = '''\
+SELECT * FROM vehicle_info WHERE booking_id=?'''
 
 
     def filled(self, id : int) -> bool:
@@ -38,21 +43,25 @@ INSERT INTO vehicle_info values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
         return item != None
 
     
-    def write_admin_packet(self, req: VehicleInfoPacket):
-        cursor = self.db_handler.cursor()
+    def write_admin_packet(self, req: VehicleInfoPacket) -> None:
+        cursor = self.db_conn.cursor()
+
         cursor.execute(self.write_template,
-        req.booking_id,
-        req.regNum,
-        req.model,
-        req.licenseExpDate,
+        req.bookingID,
+        req.vehRegNum,
+        req.vehModel,
         req.insuranceExpDate,
         req.pucExpDate,
         req.driverName,
-        req.address,
-        req.licenseNum,
+        req.driverAddress,
         req.driverContact,
+        req.licenseExpDate,
+        req.licenseNum,
         req.travAgentContact)
 
         cursor.commit()
 
-# print(db_handler().filled(1))
+
+    def get_single_booking(self, bookingID: int) -> pyodbc.Row:
+        cursor = self.db_conn.cursor()
+        return cursor.execute(self.read_template, bookingID).fetchone()
