@@ -42,7 +42,7 @@ SELECT * FROM vehicle_info WHERE booking_id=?'''
         item = cursor.execute(self.read_template.format('*', 'booking_id'), id).fetchone()
         return item != None
 
-    
+
     def write_admin_packet(self, req: VehicleInfoPacket) -> None:
         cursor = self.db_conn.cursor()
 

@@ -86,15 +86,15 @@ class _HistoryWidgetState extends State<HistoryWidget> {
             Text('Time: ${widget.data.pickupDateTime}'),
           ],
         ),
-        enabled: false,
+        enabled: widget.data.isApproved == true,
         isThreeLine: true,
         trailing: Text(
           widget.data.isApproved == null
-              ? "Not Approved"
+              ? "Not Updated"
               : (widget.data.isApproved == true ? "Accepted" : "Rejected"),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-        // dense: true,
+        dense: true,
         // horizontalTitleGap: 30,
         // leading: Text(this.index.toString()),
       ),

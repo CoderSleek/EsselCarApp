@@ -295,6 +295,7 @@ def validate_packet(req):
         return False
 
     for index in range(1, len(req)-2):
+        req[index] = req[index].strip(' ')
         if len(req[index]) == 0 or (not special_char_regex.match(req[index])) or (
             list_of_char_limits[index] < len(req[index])):
             return False

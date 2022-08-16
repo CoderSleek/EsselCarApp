@@ -1,4 +1,5 @@
 import 'package:car_book_app/historywidget.dart';
+import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,12 @@ class _StartPageState extends State<StartPage> {
     // print('before history ${HistoryWidget.histories.length}');
     // HistoryWidget.getHistory();
     // print('after history ${HistoryWidget.histories.length}');
+    bool isManager =
+        MyApp.userInfo['position'].toLowerCase().contains('manager');
+    double screenHeight = MediaQuery.of(context).size.height;
+    double appBarPadding = MediaQuery.of(context).padding.top;
+    double appBarHeight = AppBar().preferredSize.height;
+    double viewHeight = screenHeight - appBarPadding - appBarHeight - 60;
 
     return Scaffold(
       appBar: AppBar(
@@ -25,27 +32,93 @@ class _StartPageState extends State<StartPage> {
             letterSpacing: 0.3,
             wordSpacing: 0.3,
           ),
-          "History",
+          isManager ? "History and Approval" : "History",
         ),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          FractionallySizedBox(
-            heightFactor: 0.8,
-            // color: Colors.white70,
-            // height: 30,
-            // constraints: BoxConstraints(minHeight: 100, maxHeight: 300),
-            // padding: EdgeInsets.only(top: 30),
-            child: ListView.builder(
-              itemCount: HistoryWidget.histories.length,
-              itemBuilder: (context, index) {
-                return HistoryWidget(
-                  data: HistoryWidget.histories[index],
-                );
-              },
-            ),
+          // FractionallySizedBox(
+          //   heightFactor: isManager ? 0.4 : 0.6,
+          //   // color: Colors.white70,
+          //   // height: 30,
+          //   // constraints: BoxConstraints(minHeight: 100, maxHeight: 300),
+          //   // padding: EdgeInsets.only(top: 30),
+          //   child: Container(
+          //     color: Colors.black,
+          //     child: ListView.builder(
+          //       itemCount: HistoryWidget.histories.length,
+          //       itemBuilder: (context, index) {
+          //         return HistoryWidget(
+          //           data: HistoryWidget.histories[index],
+          //         );
+          //       },
+          //     ),
+          //   ),
+          // ),
+          // Column(
+          //   children: [
+          //     Visibility(
+          //       visible: isManager,
+          //       child: Expanded(
+          //         flex: 5,
+          //         child: Container(
+          //           width: double.infinity,
+          //           color: Colors.yellow,
+          //           child: Text(""),
+          //         ),
+          //       ),
+          //     ),
+
+          //     Expanded(
+          //       flex: 5,
+          //       child: Container(
+          //         width: double.infinity,
+          //         color: Colors.red,
+          //         child: Text("data"),
+          //       ),
+          //     ),
+
+          // Padding(
+          //   padding: const EdgeInsets.all(3.0),
+          //   child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: isManager ? viewHeight * 0.4 : 0,
+                color: Colors.grey,
+                // child: Text("hello"),
+              ),
+              Container(
+                height: isManager ? viewHeight * 0.6 : viewHeight * 1,
+                color: Color.fromRGBO(190, 190, 190, 1),
+                child: ListView.builder(
+                  itemCount: HistoryWidget.histories.length,
+                  itemBuilder: (context, index) {
+                    return HistoryWidget(
+                      data: HistoryWidget.histories[index],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
+          // ),
+          // Column(
+          //   children: [
+          //     Flexible(
+          //       // fit: FlexFit.values[1],
+          //       flex: 6,
+          //       child: Container(color: Colors.red),
+          //     ),
+          //     Flexible(
+          //       child: SizedBox(),
+          //       flex: 4,
+          //     )
+          //   ],
+          // ),
+
           Align(
             alignment: FractionalOffset.bottomCenter,
             child: Padding(
@@ -87,9 +160,9 @@ class _StartPageState extends State<StartPage> {
               ),
             ),
           ),
-          // HistoryWidget(data: HistoryWidget.histories[0]),
         ],
       ),
+      // HistoryWidget(data: HistoryWidget.histories[0]),
       drawer: MyDrawer(),
     );
   }
