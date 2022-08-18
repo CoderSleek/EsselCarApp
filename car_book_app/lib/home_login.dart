@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:car_book_app/historywidget.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
+import 'package:car_book_app/widgets/managerapproval.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
       // print(response.body);
       if (response.statusCode == 200) {
         MyApp.userInfo = jsonDecode(response.body);
+        ManagerApprovalWidget.getApprovals();
         HistoryWidget.getHistory();
         return true;
       } else {

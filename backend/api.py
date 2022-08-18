@@ -107,7 +107,8 @@ def employeeLogin(req: LoginRequest, response : Response):
                 'uid': row.emp_id,
                 'name': row.emp_name,
                 'email': row.emp_email,
-                'mng_email' : row.mng_email
+                'mng_email' : row.mng_email,
+                'position': row.position
             }
         else:
             response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -286,9 +287,31 @@ async def retrieveVehicleData(req: vehicleInfo, response: Response):
     except Exception as e:
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-@app.get('/getmanagerrequests')
-def getManagerRequests(mng_id: int):
-    db_book_inf().get_mng_req()
+
+@app.get('/getmanagerrequests', tags=['Employee'])
+def getManagerRequests(mng_id: int, response: Response):
+    rows = db_book_inf().get_mng_req(mng_id)
+
+    if(len(rows) == 0):
+        return rows
+
+    try:
+        for index in range(len(rows)):
+            rows[index] = {
+                'bookingID': rows[index].booking_id,
+                'empID': rows[index].emp_id,
+                'travelPurpose': rows[index].trav_purpose,
+                'expectedDist': rows[index].expected_dist,
+                'pickupDateTime': str(rows[index].pickup_date_time),
+                'pickupVenue': rows[index].pickup_venue,
+                'arrivalDateTime': str(rows[index].arrival_date_time),
+                'additionalInfo': rows[index].additional_info,
+                'approvalStatus': rows[index].approval_status
+            }
+
+        return rows
+    except Exception as e:
+        print(e)
 
 
 def validate_packet(req):

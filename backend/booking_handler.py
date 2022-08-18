@@ -27,6 +27,12 @@ booking_info(booking_id, emp_id, trav_purpose, expected_dist, pickup_date_time, 
 pickup_venue, arrival_date_time, additional_info, mng_id, request_date_time) \
 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 
+        self.read_join_template = ("SELECT booking_id, booking_info.emp_id, trav_purpose, expected_dist, "
+        "pickup_date_time, pickup_venue, arrival_date_time, "
+        "additional_info, approval_status FROM booking_info, emp_details "
+        "WHERE booking_info.emp_id = emp_details.emp_id AND emp_details.emp_mng_id = ? "
+        "ORDER BY request_date_time DESC;")
+
 
     def get_id(self) -> int:
         cursor = self.db_conn.cursor()
@@ -74,7 +80,7 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         return isApproved[0] == True
 
     
-    def get_mng_req(self, mng_id: int) -> pyodbc.Rows:
+    def get_mng_req(self, mng_id: int) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
-
-        rows = cursor.execute('SELECT * from booking_info WHERE')
+        rows = cursor.execute(self.read_join_template, mng_id).fetchmany(5)
+        return rows

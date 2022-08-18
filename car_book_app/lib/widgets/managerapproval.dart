@@ -14,7 +14,8 @@ class ManagerApprovalWidget extends StatefulWidget {
   const ManagerApprovalWidget({required this.singleData, this.index = 0});
 
   static void getApprovals() async {
-    Uri uri = Uri.http(MyApp.backendIP, '/getmanagerrequests');
+    Uri uri =
+        Uri.parse('http://${MyApp.backendIP}/getmanagerrequests?mng_id=5');
 
     try {
       http.Response res = await http.get(uri);
@@ -37,7 +38,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
     return Card(
       child: ListTile(
         title: Row(
-          children: [Text(widget.singleData['bookingID'])],
+          children: [Text(widget.singleData["bookingID"].toString())],
         ),
       ),
     );
