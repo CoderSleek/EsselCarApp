@@ -72,3 +72,9 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         cursor = self.db_conn.cursor()
         isApproved = cursor.execute('SELECT approval_status FROM booking_info WHERE booking_id=?', bid).fetchone()
         return isApproved[0] == True
+
+    
+    def get_mng_req(self, mng_id: int) -> pyodbc.Rows:
+        cursor = self.db_conn.cursor()
+
+        rows = cursor.execute('SELECT * from booking_info WHERE')

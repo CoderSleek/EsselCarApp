@@ -286,6 +286,10 @@ async def retrieveVehicleData(req: vehicleInfo, response: Response):
     except Exception as e:
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
+@app.get('/getmanagerrequests')
+def getManagerRequests(mng_id: int):
+    db_book_inf().get_mng_req()
+
 
 def validate_packet(req):
     special_char_regex = re.compile('^[A-Za-z0-9 -]*$')

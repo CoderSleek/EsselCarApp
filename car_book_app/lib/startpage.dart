@@ -1,6 +1,7 @@
 import 'package:car_book_app/historywidget.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
+import 'package:car_book_app/widgets/managerapproval.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -88,7 +89,14 @@ class _StartPageState extends State<StartPage> {
               Container(
                 height: isManager ? viewHeight * 0.4 : 0,
                 color: Colors.grey,
-                // child: Text("hello"),
+                child: ListView.builder(
+                  itemCount: ManagerApprovalWidget.dataList.length,
+                  itemBuilder: (context, index) {
+                    return ManagerApprovalWidget(
+                      singleData: ManagerApprovalWidget.dataList[index],
+                    );
+                  },
+                ),
               ),
               Container(
                 height: isManager ? viewHeight * 0.6 : viewHeight * 1,

@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:car_book_app/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -20,8 +18,6 @@ class HistoryData {
   HistoryData.fromJson(Map<String, dynamic> item) {
     uid = item['uid'];
     travelPurpose = item['travelPurpose'];
-    // travelPurpose =
-    // 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     expectedDistance = item['expectedDistance'];
     pickupVenue = item['pickupVenue'];
     additionalInfo = item['additionalInfo'];
