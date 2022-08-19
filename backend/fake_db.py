@@ -1,21 +1,22 @@
 class emp_item:
-    def __init__(self, uid, pas, name, email, mng_email):
+    def __init__(self, uid, pas, name, email, mng_email, position):
         self.emp_id = uid
         self.emp_name = name
         self.password = pas
         self.emp_email = email
         self.mng_email = mng_email
+        self.position = position
 
     def __repr__(self):
-        return f"{self.emp_id} {self.emp_name} {self.password} {self.emp_email} {self.mng_email}"
+        return f"{self.emp_id} {self.emp_name} {self.password} {self.emp_email} {self.mng_email} {self.position}"
 
 
 class db_emp_det:
     
     def __init__(self):
         self.items = []
-        self.items.append(emp_item(1, '123456', 'dev', 'dn@gmail.com', 'dn1@gm.com'))
-        self.items.append(emp_item(2, '567890', 'test', 'test@gmail.com', 'test@gm.com'))
+        self.items.append(emp_item(1, '123456', 'dev', 'dn@gmail.com', 'dn1@gm.com', 'employee'))
+        self.items.append(emp_item(2, '567890', 'test', 'test@gmail.com', 'test@gm.com', 'manager'))
         for item in self.items:
             print(item)
 
@@ -31,7 +32,7 @@ class book_item:
 
     def __init__(self, eid, pur, expdet, pkdt, pkven, arrdt, addinf, reqdt, appr=None):
         book_item.ids += 1
-        self.bid = book_item.ids
+        self.booking_id = book_item.ids
         self.emp_id = eid
         self.trav_purpose = pur
         self.expected_dist = expdet
@@ -43,7 +44,7 @@ class book_item:
         self.approval_status = appr
 
     def __repr__(self):
-        return f"{self.bid} {self.emp_id} {self.trav_purpose} {self.expected_dist} {self.pickup_date_time}\
+        return f"{self.booking_id} {self.emp_id} {self.trav_purpose} {self.expected_dist} {self.pickup_date_time}\
  {self.pickup_venue} {self.arrival_date_time} {self.additional_info} {self.reqDateTime} {self.approval_status}"
 
 
@@ -81,7 +82,7 @@ class db_book_inf:
     def read(self, eid):
         x = []
         for item in self.items:
-            print(item)
+            # print(item)
             if item.emp_id == eid:
                 x.append(item)
 
@@ -90,6 +91,27 @@ class db_book_inf:
 
     def get_rows(self):
         return iter(self.items)
+
+
+    def get_mng_req(self, emp_id):
+        # rows = []
+        # i = 1
+        # for i in self.items:
+        #     rows.append({
+        #         'bookingID': i.booking_id,
+        #         'empID': i.emp_id,
+        #         'travPurpose': i.trav_purpose,
+        #         'expectedDist': i.expected_dist,
+        #         'pickupDateTime': i.pickup_date_time,
+        #         'pickupVenue': i.pickup_venue,
+        #         'arrivalDateTime': i.arrival_date_time,
+        #         'additionalInfo': i.additional_info,
+        #         'approvalStatus': i.approval_status,
+        #     })
+
+        return self.items
+
+
 
 new1 = db_emp_det()
 new2 = db_book_inf()

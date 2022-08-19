@@ -12,10 +12,10 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
-from vehicle_handler import db_handler as db_veh_info
-# from fake_db import db_emp_det, db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+# from vehicle_handler import db_handler as db_veh_info
+from fake_db import db_emp_det, db_book_inf
 
 import json
 from datetime import datetime, date
@@ -173,7 +173,8 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
             json_list.append(data)
 
         return json_list
-    except:
+    except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
@@ -289,11 +290,11 @@ async def retrieveVehicleData(req: vehicleInfo, response: Response):
 
 
 @app.get('/getmanagerrequests', tags=['Employee'])
-def getManagerRequests(mng_id: int, response: Response):
-    rows = db_book_inf().get_mng_req(mng_id)
+def getManagerRequests(emp_id: int, response: Response):
+    rows = db_book_inf().get_mng_req(emp_id)
 
     if(len(rows) == 0):
-        return rows
+        return []
 
     try:
         for index in range(len(rows)):
@@ -308,8 +309,8 @@ def getManagerRequests(mng_id: int, response: Response):
                 'additionalInfo': rows[index].additional_info,
                 'approvalStatus': rows[index].approval_status
             }
-
         return rows
+
     except Exception as e:
         print(e)
 

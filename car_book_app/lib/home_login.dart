@@ -71,29 +71,36 @@ class _LoginPageState extends State<LoginPage> {
     //   );
     //   return false;
     // }
-
+    late http.Response response;
     try {
-      http.Response response = await http.post(
+      response = await http.post(
         uri,
         headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
-      // final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
-      //     headers: <String, String>{
-      //       'Content-Type': 'application/json; charset=UTF-8',
-      //     },
-      //     body: jsonEncode({'uid': 1, 'password': '123456'}));
-      // print(response.body);
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Connectivity Error");
+      return false;
+    }
+    // final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json; charset=UTF-8',
+    //     },
+    //     body: jsonEncode({'uid': 1, 'password': '123456'}));
+    // print(response.body);
+    try {
       if (response.statusCode == 200) {
         MyApp.userInfo = jsonDecode(response.body);
-        ManagerApprovalWidget.getApprovals();
+        if (MyApp.userInfo['position'].toLowerCase().contains('manager')) {
+          ManagerApprovalWidget.getApprovals();
+        }
         HistoryWidget.getHistory();
         return true;
       } else {
         Fluttertoast.showToast(msg: jsonDecode(response.body));
       }
     } catch (err) {
-      Fluttertoast.showToast(msg: "Connectivity Error");
+      Fluttertoast.showToast(msg: "Internal Error");
     }
     return false;
   }
