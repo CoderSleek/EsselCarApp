@@ -121,10 +121,10 @@ class _CreateBookingState extends State<CreateBooking> {
     super.dispose();
   }
 
-  Future<String> fetchPosts() async {
-    final response = await http.get(Uri.parse('http://10.0.3.2:5000/'));
-    return response.body;
-  }
+  // Future<String> fetchPosts() async {
+  //   final response = await http.get(Uri.parse('http://10.0.3.2:5000/'));
+  //   return response.body;
+  // }
 
   @override
   Widget build(BuildContext context) {

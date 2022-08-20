@@ -22,16 +22,17 @@ class HistoryData {
     pickupVenue = item['pickupVenue'];
     additionalInfo = item['additionalInfo'];
     isApproved = item['approvalStatus'];
+    pickupDateTime = item['pickupDateTime'];
+    arrivalDateTime = item['arrivalDateTime'];
+    // final RegExp dt = RegExp(r'^([\d]+)-(\d\d)-(\d\d).(\d\d):(\d\d)');
+    // RegExpMatch? match = dt.firstMatch(item['pickupDateTime']);
 
-    final RegExp dt = RegExp(r'^([\d]+)-(\d\d)-(\d\d).(\d\d):(\d\d)');
-    RegExpMatch? match = dt.firstMatch(item['pickupDateTime']);
+    // pickupDateTime =
+    //     '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
 
-    pickupDateTime =
-        '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
-
-    match = dt.firstMatch(item['arrivalDateTime']);
-    arrivalDateTime =
-        '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
+    // match = dt.firstMatch(item['arrivalDateTime']);
+    // arrivalDateTime =
+    //     '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
   }
 }
 

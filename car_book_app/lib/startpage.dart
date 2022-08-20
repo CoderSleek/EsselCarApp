@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StartPage extends StatefulWidget {
+  static int x = 0;
+
   @override
   State<StartPage> createState() => _StartPageState();
 }
@@ -93,14 +95,21 @@ class _StartPageState extends State<StartPage> {
                   itemCount: ManagerApprovalWidget.dataList.length,
                   itemBuilder: (context, index) {
                     return ManagerApprovalWidget(
-                      singleData: ManagerApprovalWidget.dataList[index],
+                      index,
                     );
                   },
                 ),
               ),
+              // Container(
+              //   height: isManager ? viewHeight * 0.4 : 0,
+              //   color: Colors.grey,
+              //   child: Column(
+              //     children: approvalWidgets,
+              //   ),
+              // ),
               Container(
                 height: isManager ? viewHeight * 0.6 : viewHeight * 1,
-                color: Color.fromRGBO(190, 190, 190, 1),
+                color: const Color.fromRGBO(190, 190, 190, 1),
                 child: ListView.builder(
                   itemCount: HistoryWidget.histories.length,
                   itemBuilder: (context, index) {
@@ -112,7 +121,6 @@ class _StartPageState extends State<StartPage> {
               ),
             ],
           ),
-          // ),
           // Column(
           //   children: [
           //     Flexible(
