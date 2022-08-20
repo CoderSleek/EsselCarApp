@@ -57,7 +57,7 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         cursor.commit()
 
 
-    def set_approval_status(self, value : bool, bid: int):
+    def set_approval_status(self, bid : int, value: bool):
         cursor = self.db_conn.cursor()
         cursor.execute('UPDATE booking_info SET approval_status=? WHERE booking_id=?;', value, bid)
 

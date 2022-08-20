@@ -12,7 +12,7 @@ body{
     height: 100vh;
     width: 100%;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    background: url(./bg5.jpg);
+    background-image: url(./bg5.jpg);
     background-repeat: no-repeat;
     background-size:cover;
     position:absolute;
@@ -52,17 +52,20 @@ body{
     /* display: flex; */
     /* padding: 100px; */
     display: block;
-    height: 60%;
-    width: 60vw;
+    height: 75vh;
+    width: 75vw;
     border: 1px solid black;
     overflow-y: auto;
+    background-color: #dee2e6;
+    padding: 12px;
+    border-radius: 25px;
 }
 
 .content{
     /* width: 100%; */
     margin: 10px 7px;
     padding: 4px 4px 4px 10px;
-    border: 1px solid green;
+    border: 1px solid black;
     border-radius: 8px;
     /* height: 155px; */
     min-height: fit-content;
@@ -92,6 +95,7 @@ body{
 .heading{
     font-family: 'Trebuchet MS', sans-serif;
     font-weight: bold;
+    /* font-size: 20px; */
 }
 
 .btn-class{
@@ -103,7 +107,8 @@ body{
     border: none;
     font-size: 18px;
     /* background-color: #008CBA; */
-    background-color: #009ace;
+    /* background-color: #009ace; */
+    background-color: #41424c;
     border-radius: 4px;
     /* width: 40px; */
     padding: 5px 8px;
@@ -112,12 +117,14 @@ body{
 }
 
 .btn-class:hover{
-    background-color: #00b1ec;
+    /* background-color: #00b1ec; */
+    background-color: #696880;
     box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
 }
 
 .btn-class:active{
-    background-color: #168eb6;
+    /* background-color: #168eb6; */
+    background-color: #373749;
     box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
 }
 
@@ -143,7 +150,12 @@ body{
 }
 
 .hide-body{
-    background-color: rgba(32, 32, 32, 0.5) !important;
+    /* display: none; */
+    /* background: rgba(32, 32, 32, 0.5) url(bg5.jpg) !important; */
+    /* background-image: url(bg5.jpg); */
+    /* background: rgb(237, 230, 230) !important; */
+    /* z-index: 1; */
+    background-image: linear-gradient(rgba(32, 32, 32, 0.5), rgba(32, 32, 32, 0.5)), url(./bg5.jpg) !important;
     overflow: hidden !important;
 }
 
@@ -191,4 +203,9 @@ body{
     bottom: 3px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.pageButtons{
+    color: whitesmoke;
+    text-shadow: 1px 1px 1px #000000;
 }

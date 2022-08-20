@@ -59,6 +59,30 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
     super.dispose();
   }
 
+  void sendStatus(bool status) async {
+    Map<String, dynamic> dataPacket = {
+      'bookingID': singleData["bookingID"],
+      'status': status,
+      'comments': _comments.text
+    };
+
+    try {
+      http.Response res = await http.put(
+        Uri.http(MyApp.backendIP, '/approval'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(dataPacket),
+      );
+      if (res.statusCode == 202) {
+        setState(() {
+          singleData["isApproved"] = status;
+        });
+      }
+      Fluttertoast.showToast(msg: jsonDecode(res.body));
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Connection Error");
+    }
+  }
+
   Future openPopup(bool status) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -98,7 +122,11 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                   const Color.fromARGB(255, 22, 128, 26),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                sendStatus(status);
+                _comments.text = '';
+                Navigator.of(context).pop();
+              },
               child: const Text("Yes"),
             ),
             ElevatedButton(
@@ -108,6 +136,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                 ),
               ),
               onPressed: () {
+                _comments.text = '';
                 Navigator.of(context).pop();
               },
               child: const Text("No"),
@@ -119,6 +148,8 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
   Future openInfoDialog() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           title: Text(
             "Additional information for Request ${singleData["travelPurpose"]}",
           ),
@@ -128,12 +159,15 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
               children: [
                 TextField(
                   enabled: false,
-                  decoration: const InputDecoration(labelText: "EmployeeID"),
+                  decoration: const InputDecoration(
+                    labelText: "EmployeeID",
+                  ),
                   controller:
                       TextEditingController(text: '${singleData["empID"]}'),
                 ),
                 TextField(
                   enabled: false,
+                  maxLines: null,
                   decoration:
                       const InputDecoration(labelText: "Travel Purpose"),
                   controller:
@@ -154,6 +188,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                 ),
                 TextField(
                   enabled: false,
+                  maxLines: null,
                   decoration: const InputDecoration(labelText: "Pickup Venue"),
                   controller:
                       TextEditingController(text: singleData["pickupVenue"]),
@@ -166,8 +201,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                 ),
                 TextField(
                   enabled: false,
-                  minLines: 1,
-                  maxLines: 5,
+                  maxLines: null,
                   decoration:
                       const InputDecoration(labelText: "Additional Info"),
                   controller: TextEditingController(
@@ -176,7 +210,13 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
               ],
             ),
           ),
-          // insetPadding: EdgeInsets.all(1),
+          // actions: [
+          //   ElevatedButton(
+          //       onPressed: () {
+          //         Navigator.of(context).pop();
+          //       },
+          //       child: const Text('ok'))
+          // ],
         ),
       );
 
@@ -212,63 +252,75 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
       child: ListTile(
         onTap: openInfoDialog,
         isThreeLine: true,
-        dense: true,
+        // dense: true,
         enabled: singleData['isApproved'] == null,
         // enabled: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // title: Row(
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // children: [
+        // Text('Pick up Time ${widget.singleData["pickupDateTime"]}'),
+        // ],
+        // ),
+        title: Text('Employee id: ${widget.singleData["empID"]}'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Employee id: ${widget.singleData["empID"]}'),
-            // Text('Pick up Time ${widget.singleData["pickupDateTime"]}'),
+            Text(
+              "Travel Purpose: ${singleData["travelPurpose"]}",
+              style: const TextStyle(
+                // color: Colors.black,
+                height: 1.2,
+              ),
+            ),
+            Visibility(
+              visible: singleData['isApproved'] == null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.green),
+                      visualDensity: VisualDensity.compact,
+                      overlayColor: MaterialStateProperty.all<Color>(
+                        const Color.fromARGB(255, 3, 128, 67),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.symmetric(horizontal: 15),
+                      ),
+                    ),
+                    onPressed: () => openPopup(true),
+                    child: const Text(
+                      "Approve",
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          const Color.fromARGB(255, 201, 54, 44)),
+                      visualDensity: VisualDensity.compact,
+                      overlayColor: MaterialStateProperty.all<Color>(
+                        const Color.fromARGB(255, 128, 3, 3),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.symmetric(horizontal: 15),
+                      ),
+                    ),
+                    onPressed: () => openPopup(false),
+                    child: const Text(
+                      "Reject",
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        ),
-        subtitle: Visibility(
-          visible: singleData['isApproved'] == null,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.green),
-                  visualDensity: VisualDensity.compact,
-                  overlayColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(255, 3, 128, 67),
-                  ),
-                  padding: MaterialStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.symmetric(horizontal: 15),
-                  ),
-                ),
-                onPressed: () => openPopup(true),
-                child: const Text(
-                  "Approve",
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 201, 54, 44)),
-                  visualDensity: VisualDensity.compact,
-                  overlayColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(255, 128, 3, 3),
-                  ),
-                  padding: MaterialStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.symmetric(horizontal: 15),
-                  ),
-                ),
-                onPressed: () => openPopup(false),
-                child: const Text(
-                  "Reject",
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
         trailing: Visibility(
           visible: singleData['isApproved'] != null,

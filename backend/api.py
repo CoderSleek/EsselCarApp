@@ -67,6 +67,11 @@ class tokenType(BaseModel):
 class vehicleInfo(BaseModel):
     bookingID: int
 
+class setBookingStatus(BaseModel):
+    bookingID:int
+    status: bool
+    comments: str
+
 
 app = FastAPI()
 
@@ -147,11 +152,21 @@ def createNewbooking(req: NewBooking, response: Response):
         return "Internal Server Error"
 
 
-@app.put('/approval/{bid}/{val}', tags=['Employee'])
-def setResponseStatus(val: bool, bid: int, response: Response):
+@app.put('/approval', tags=['Employee'])
+def setResponseStatus(res: setBookingStatus, response: Response):
+    print(res)
+    if res.comments != '':
+        res.comments = res.comments.strip(' ')
+        if not re.match('^[\w .-]+$',res.comments):
+            response.status_code = status.HTTP_406_NOT_ACCEPTABLE
+            return "Inavlid Comment"
+
     try:
-        db_book_inf().set_approval_status(val, bid)
-    except:
+        db_book_inf().set_approval_status(res.bookingID, res.status)
+        response.status_code = status.HTTP_202_ACCEPTED
+        return "Status Set"
+    except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 

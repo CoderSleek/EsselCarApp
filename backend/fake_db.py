@@ -48,7 +48,7 @@ class book_item:
 
     def __repr__(self):
         return f"{self.booking_id} {self.emp_id} {self.trav_purpose} {self.expected_dist} {self.pickup_date_time}\
- {self.pickup_venue} {self.arrival_date_time} {self.additional_info} {self.reqDateTime} {self.approval_status}"
+ {self.pickup_venue} {self.arrival_date_time} {self.additional_info} {self.request_date_time} {self.approval_status}"
 
 
 class db_book_inf:
@@ -75,9 +75,9 @@ class db_book_inf:
             print(item)
 
 
-    def set_approval_status(self, val, bid):
+    def set_approval_status(self, bid, val):
         for item in self.items:
-            if item.bid == bid:
+            if item.booking_id == bid:
                 item.approval_status = val
 
         for item in self.items:
