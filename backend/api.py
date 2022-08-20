@@ -12,10 +12,10 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
-from vehicle_handler import db_handler as db_veh_info
-# from fake_db import db_emp_det, db_book_inf
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+# from vehicle_handler import db_handler as db_veh_info
+from fake_db import db_emp_det, db_book_inf
 
 import json
 from datetime import datetime, date
@@ -160,7 +160,6 @@ def setResponseStatus(val: bool, bid: int, response: Response):
 def retrieveUserHistories(uid : int, response: Response) -> list:
     try:
         rows_list = db_book_inf().read(uid)
-        
         for i in range(len(rows_list)):
             pickupDateTime = rows_list[i].pickup_date_time.strftime("%I:%M %p %d-%m-%Y")
             arrivalDateTime = rows_list[i].arrival_date_time.strftime("%I:%M %p %d-%m-%Y")

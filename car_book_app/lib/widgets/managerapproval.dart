@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/startpage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
@@ -39,17 +40,30 @@ class ManagerApprovalWidget extends StatefulWidget {
 }
 
 class _ManagerApprovalState extends State<ManagerApprovalWidget> {
-  bool? isApproved;
+  // bool? isApproved;
+  late final Map<dynamic, dynamic> singleData;
   final TextEditingController _comments = TextEditingController();
   // _ManagerApprovalState(int index) {
   //   isApproved = ManagerApprovalWidget.dataList[index]["isApproved"];
   // }
 
+  @override
+  void initState() {
+    super.initState();
+    singleData = widget.singleData;
+  }
+
+  @override
+  void dispose() {
+    _comments.dispose();
+    super.dispose();
+  }
+
   Future openPopup(bool status) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(
-              "Are you sure you want to ${status ? 'Approve' : 'Reject'} this request?"),
+              "Are you sure you want to ${status ? 'Approve' : 'Reject'} this request for employee ${singleData["empID"]}?"),
           content: TextField(
             maxLines: 5,
             maxLength: 300,
@@ -102,17 +116,69 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
         ),
       );
 
-  @override
-  void initState() {
-    super.initState();
-    isApproved = widget.singleData["isApproved"];
-  }
-
-  @override
-  void dispose() {
-    _comments.dispose();
-    super.dispose();
-  }
+  Future openInfoDialog() => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            "Additional information for Request ${singleData["travelPurpose"]}",
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                TextField(
+                  enabled: false,
+                  decoration: const InputDecoration(labelText: "EmployeeID"),
+                  controller:
+                      TextEditingController(text: '${singleData["empID"]}'),
+                ),
+                TextField(
+                  enabled: false,
+                  decoration:
+                      const InputDecoration(labelText: "Travel Purpose"),
+                  controller:
+                      TextEditingController(text: singleData["travelPurpose"]),
+                ),
+                TextField(
+                  enabled: false,
+                  decoration:
+                      const InputDecoration(labelText: "Expected Distance"),
+                  controller: TextEditingController(
+                      text: '${singleData["expectedDist"]}'),
+                ),
+                TextField(
+                  enabled: false,
+                  decoration: const InputDecoration(labelText: "Pickup Time"),
+                  controller:
+                      TextEditingController(text: singleData["pickupDateTime"]),
+                ),
+                TextField(
+                  enabled: false,
+                  decoration: const InputDecoration(labelText: "Pickup Venue"),
+                  controller:
+                      TextEditingController(text: singleData["pickupVenue"]),
+                ),
+                TextField(
+                  enabled: false,
+                  decoration: const InputDecoration(labelText: "Arrival Time"),
+                  controller: TextEditingController(
+                      text: singleData["arrivalDateTime"]),
+                ),
+                TextField(
+                  enabled: false,
+                  minLines: 1,
+                  maxLines: 5,
+                  decoration:
+                      const InputDecoration(labelText: "Additional Info"),
+                  controller: TextEditingController(
+                      text: singleData["additionalInfo"] ?? 'Nothing'),
+                ),
+              ],
+            ),
+          ),
+          // insetPadding: EdgeInsets.all(1),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -144,12 +210,10 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
 
     return Card(
       child: ListTile(
-        onTap: () {
-          print("hello world");
-        },
+        onTap: openInfoDialog,
         isThreeLine: true,
         dense: true,
-        enabled: isApproved == null,
+        enabled: singleData['isApproved'] == null,
         // enabled: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,7 +223,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
           ],
         ),
         subtitle: Visibility(
-          visible: isApproved == null,
+          visible: singleData['isApproved'] == null,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -207,8 +271,9 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
           ),
         ),
         trailing: Visibility(
-          visible: isApproved != null,
-          child: Text(isApproved == true ? "Approved" : "Rejected"),
+          visible: singleData['isApproved'] != null,
+          child:
+              Text(singleData['isApproved'] == true ? "Approved" : "Rejected"),
         ),
       ),
     );

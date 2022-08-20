@@ -1,11 +1,14 @@
+from datetime import datetime
+
 class emp_item:
-    def __init__(self, uid, pas, name, email, mng_email, position):
+    def __init__(self, uid, pas, name, email, mng_email, position, mng_id):
         self.emp_id = uid
         self.emp_name = name
         self.password = pas
         self.emp_email = email
         self.mng_email = mng_email
         self.position = position
+        self.emp_mng_id = mng_id
 
     def __repr__(self):
         return f"{self.emp_id} {self.emp_name} {self.password} {self.emp_email} {self.mng_email} {self.position}"
@@ -15,8 +18,8 @@ class db_emp_det:
     
     def __init__(self):
         self.items = []
-        self.items.append(emp_item(1, '123456', 'dev', 'dn@gmail.com', 'dn1@gm.com', 'employee'))
-        self.items.append(emp_item(2, '567890', 'test', 'test@gmail.com', 'test@gm.com', 'manager'))
+        self.items.append(emp_item(1, '123456', 'dev', 'dn@gmail.com', 'dn1@gm.com', 'employee', 2))
+        self.items.append(emp_item(2, '567890', 'test', 'test@gmail.com', 'test@gm.com', 'manager', 7))
         for item in self.items:
             print(item)
 
@@ -36,11 +39,11 @@ class book_item:
         self.emp_id = eid
         self.trav_purpose = pur
         self.expected_dist = expdet
-        self.pickup_date_time = pkdt
+        self.pickup_date_time = datetime.strptime(pkdt, "%Y-%m-%d %H:%M:%S")
         self.pickup_venue = pkven
-        self.arrival_date_time = arrdt
+        self.arrival_date_time = datetime.strptime(arrdt, "%Y-%m-%d %H:%M:%S")
         self.additional_info = addinf
-        self.reqDateTime = reqdt
+        self.request_date_time = reqdt
         self.approval_status = appr
 
     def __repr__(self):
@@ -55,6 +58,8 @@ class db_book_inf:
         self.items.append(book_item(1,'a', 2.82, '2022-08-31 15:00:00', 'a', '2022-08-31 16:00:00'
         ,None, '2022-08-31 13:00:00'))
         self.items.append(book_item(1,'b', 2.82, '2022-08-31 15:00:00', 'b', '2022-08-31 16:00:00'
+        ,None, '2022-08-31 13:00:00'))
+        self.items.append(book_item(2,'c', 2.82, '2022-08-31 15:00:00', 'c', '2022-08-31 16:00:00'
         ,None, '2022-08-31 13:00:00'))
         
         for item in self.items:
@@ -82,7 +87,6 @@ class db_book_inf:
     def read(self, eid):
         x = []
         for item in self.items:
-            # print(item)
             if item.emp_id == eid:
                 x.append(item)
 
@@ -108,8 +112,7 @@ class db_book_inf:
         #         'additionalInfo': i.additional_info,
         #         'approvalStatus': i.approval_status,
         #     })
-
-        return self.items
+        return [i for i in self.items]
 
 
 
@@ -121,3 +124,5 @@ def db_emp_det():
 
 def db_book_inf():
     return new2
+
+new2.get_mng_req(2)
