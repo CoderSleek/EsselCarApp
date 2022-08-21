@@ -83,14 +83,22 @@ class _StartPageState extends State<StartPage> {
           //     ),
 
           // Padding(
-          //   padding: const EdgeInsets.all(3.0),
+          //   padding: const EdgeInsets.all(5),
           //   child:
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
+                // margin: isManager
+                //     ? const EdgeInsets.only(bottom: 3)
+                //     : const EdgeInsets.all(0),
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(190, 190, 190, 1),
+                  border: Border(
+                    bottom: BorderSide(width: 2),
+                  ),
+                ),
                 height: isManager ? viewHeight * 0.4 : 0,
-                color: Colors.grey,
                 child: ListView.builder(
                   itemCount: ManagerApprovalWidget.dataList.length,
                   itemBuilder: (context, index) {
@@ -109,7 +117,7 @@ class _StartPageState extends State<StartPage> {
               // ),
               Container(
                 height: isManager ? viewHeight * 0.6 : viewHeight * 1,
-                color: const Color.fromRGBO(190, 190, 190, 1),
+                color: Color.fromARGB(78, 107, 21, 160),
                 child: ListView.builder(
                   itemCount: HistoryWidget.histories.length,
                   itemBuilder: (context, index) {

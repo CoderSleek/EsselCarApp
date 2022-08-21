@@ -4,11 +4,6 @@ let data = [];
 
 async function get_data(){
     data = [];
-    data = [
-        {"bookingID":3,"empID":1,"travelPurpose":"morning","expectedDist":42,"pickupDateTime":"01:03 AM 04-08-2022","pickupVenue":"morning","arrivalDateTime":"01:00 AM 04-08-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"10:33 AM 04-08-2022", "hasInfoFilled":false},
-        {"bookingID":2,"empID":1,"travelPurpose":"timepass","expectedDist":20.8,"pickupDateTime":"03:59 PM 31-07-2022","pickupVenue":"kolkata","arrivalDateTime":"09:40 PM 31-07-2022","additionalInfo":null,"mngID":5,"isApproved":true,"requestDateTime":"04:00 PM 31-07-2022", "hasInfoFilled":true},
-        {"bookingID":1,"empID":1,"travelPurpose":"business","expectedDist":7.5,"pickupDateTime":"10:00 AM 08-01-2022","pickupVenue":"office","arrivalDateTime":"11:00 AM 08-01-2022","additionalInfo":null,"mngID":5,"isApproved":null,"requestDateTime":"09:00 AM 08-01-2022", "hasInfoFilled":false}
-    ]
     try{
         response = await fetch(BACKEND_URL + 'getbookingrequests',
         {method: 'POST',
@@ -28,8 +23,6 @@ async function get_data(){
 
         return;
     }
-    data[0].isApproved = data[1].isApproved = true;
-    data[1].hasInfoFilled = true;
     display_data();
 }
 

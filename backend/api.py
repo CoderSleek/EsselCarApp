@@ -12,10 +12,10 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
-# from vehicle_handler import db_handler as db_veh_info
-from fake_db import db_emp_det, db_book_inf
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
+from vehicle_handler import db_handler as db_veh_info
+# from fake_db import db_emp_det, db_book_inf
 
 import json
 from datetime import datetime, date
@@ -190,7 +190,6 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
 
         return rows_list
     except Exception as e:
-        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
@@ -202,17 +201,15 @@ def adminCredentialValidation(req: AdminLoginRequest) -> str:
 
 
 @app.get('/adminpage', tags=['Admin'])
-def adminContentPage(token : tokenType, request: Request):
-    # return templates.TemplateResponse("index.html", {"request":request})
-    # print(token.token)
+def adminContentPage(token : str, response: Response, request: Request):
     try:
         package = jwt.decodeJWT(token)
-        if package['userName'] == 'admin' and package['password'] == 'admin':
+        if package is not None and package['userName'] == 'admin' and package['password'] == 'admin':
             return templates.TemplateResponse("adminpage.html", {"request":request})
         else:
             response.status_code = status.HTTP_403_FORBIDDEN
             return templates.TemplateResponse("error.html", {"request": request})
-    except err:
+    except Exception as err:
         response.status_code = status.HTTP_403_FORBIDDEN
         return templates.TemplateResponse("error.html", {"request": request})
     
@@ -264,13 +261,11 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return
 
-    print('after if')
     try:
         pass
-        # db_veh_info().write_admin_packet(req)
+        db_veh_info().write_admin_packet(req)
     except Exception as e:
-        print(e)
-        # response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @app.post('/getvehicleinfo', tags=['Admin'])
@@ -331,7 +326,7 @@ def getManagerRequests(emp_id: int, response: Response):
         return rows
 
     except Exception as e:
-        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def validate_packet(req):

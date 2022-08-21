@@ -320,6 +320,7 @@ class _CreateBookingState extends State<CreateBooking> {
                 ),
                 TextFormField(
                   controller: _additionalInput,
+                  maxLength: 500,
                   validator: (value) {
                     if (!(value!.contains(RegExp(r'^[a-zA-Z ]*$')))) {
                       return "Can only contain alphabets";

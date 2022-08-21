@@ -20,3 +20,4 @@ doc/api/
 *.js.deps
 *.js.map
 __pycache__/
+__pycache__/fake_db.cpython-310.pyc
