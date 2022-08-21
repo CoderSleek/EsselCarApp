@@ -55,6 +55,7 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         request.reqDateTime)
         
         cursor.commit()
+        return True
 
 
     def set_approval_status(self, bid : int, value: bool):
@@ -62,6 +63,7 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         cursor.execute('UPDATE booking_info SET approval_status=? WHERE booking_id=?;', value, bid)
 
         cursor.commit()
+        return True
 
 
     def read(self, uid: int, rowcount: int = 5):

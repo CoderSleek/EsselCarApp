@@ -12,6 +12,7 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
+from mail import email_manager, email_requests
 from login_handler import db_handler as db_emp_det
 from booking_handler import db_handler as db_book_inf
 from vehicle_handler import db_handler as db_veh_info
@@ -112,7 +113,7 @@ def employeeLogin(req: LoginRequest, response : Response):
                 'uid': row.emp_id,
                 'name': row.emp_name,
                 'email': row.emp_email,
-                'mng_email' : row.mng_email,
+                # 'mng_email' : row.mng_email,
                 'position': row.position
             }
         else:
@@ -146,7 +147,15 @@ def createNewbooking(req: NewBooking, response: Response):
         return "Bad Request"
         
     try:
-        db_book_inf().write(req)
+        status = db_book_inf().write(req)
+        if status:
+            data_packet = {
+                'mngName':'',
+                'empName':'',
+                'travPurpose':'',
+                'receiverEmail':''
+            }
+            email_manager().email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
     except err:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
