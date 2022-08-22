@@ -67,9 +67,10 @@ class email_manager:
                 # smt.sendmail(SENDER_EMAIL_ADDRESS, reciever_email, msg)
                 smt.send_message(msg)
 
-                print('done')
+                # print('done')
             except err:
-                print('failed', err)
+                pass
+                # print('failed', err)
 
 
     @staticmethod

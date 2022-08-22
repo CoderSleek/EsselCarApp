@@ -8,8 +8,10 @@ class db_handler:
         "Database=VehicleAPP;"
         "Trusted_Connection=yes;"
         )
-        self.read_query_template = """SELECT * FROM emp_details WHERE emp_id=?;"""
-        self.write_query_template = 'INSERT INTO emp_details VALUES({0},{1},{2},{3},{4});'
+
+        self.read_query_template = "SELECT * FROM emp_details WHERE emp_id=?;"
+        self.get_mng_template = ("SELECT * FROM emp_details WHERE emp_id="
+        "(SELECT emp_mng_id FROM emp_details WHERE emp_id=?);")
 
 
     # def _create_read_query(self, read_json_data: dict) -> str:
@@ -42,6 +44,12 @@ class db_handler:
         #fetchone returns the first sql row
         #in this case uid is unique so the database will always return one row
         return row
+
+    
+    def get_mng_details(self, uid : int) -> int:
+        cursor = self.db_conn.cursor()
+        return cursor.execute(self.get_mng_template, uid).fetchone()
+        #fetchone returns first row of db, .emp_mng_id returns the corresponding row value
 
 
     def write(self) -> bool:

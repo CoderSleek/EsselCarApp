@@ -36,6 +36,7 @@ class NewBooking(BaseModel):
     arrivalDateTime: str
     additionalInfo: Optional[str | None]
     reqDateTime: Optional[str]
+    managerID: Optional[int]
 
 
 class AdminLoginRequest(BaseModel):
@@ -142,6 +143,8 @@ def createNewbooking(req: NewBooking, response: Response):
         # req.reqDateTime = ' '.join(temp[0])
         # temp = re.findall('^([\d]+)-(\d\d)-(\d\d).*(\d\d):(\d\d):(\d\d)', str(datetime.datetime.now()))
         req.reqDateTime = str(datetime.now()).split('.')[0]
+        manager_details = db_emp_det().get_mng_details(req.uid)
+        req.managerID = manager_details.emp_id
     except:
         response.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return "Bad Request"
@@ -150,10 +153,10 @@ def createNewbooking(req: NewBooking, response: Response):
         status = db_book_inf().write(req)
         if status:
             data_packet = {
-                'mngName':'',
-                'empName':'',
-                'travPurpose':'',
-                'receiverEmail':''
+                'mngName': manager_details.emp_name,
+                'empName': db_emp_det().read(req.uid).emp_name,
+                'travPurpose': req.travelPurpose,
+                'receiverEmail': manager_details.emp_email
             }
             email_manager().email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
     except err:

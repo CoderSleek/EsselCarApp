@@ -11,6 +11,7 @@ class NewBooking(BaseModel):
     arrivalTimeDate: str
     additionalInfo: (str | None)
     reqDateTime: str
+    managerID: int
 
 
 class db_handler:
@@ -22,16 +23,16 @@ class db_handler:
         "Trusted_Connection=yes;"
         )
 
-        self.write_template = "INSERT INTO \
-booking_info(booking_id, emp_id, trav_purpose, expected_dist, pickup_date_time, \
-pickup_venue, arrival_date_time, additional_info, mng_id, request_date_time) \
-VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        self.write_template = ("INSERT INTO "
+            "booking_info(booking_id, emp_id, trav_purpose, expected_dist, pickup_date_time, "
+            "pickup_venue, arrival_date_time, additional_info, mng_id, request_date_time) "
+            "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
 
         self.read_join_template = ("SELECT booking_id, booking_info.emp_id, trav_purpose, expected_dist, "
-        "pickup_date_time, pickup_venue, arrival_date_time, "
-        "additional_info, approval_status FROM booking_info, emp_details "
-        "WHERE booking_info.emp_id = emp_details.emp_id AND emp_details.emp_mng_id = ? "
-        "ORDER BY request_date_time DESC;")
+            "pickup_date_time, pickup_venue, arrival_date_time, "
+            "additional_info, approval_status FROM booking_info, emp_details "
+            "WHERE booking_info.emp_id = emp_details.emp_id AND emp_details.emp_mng_id = ? "
+            "ORDER BY request_date_time DESC;")
 
 
     def get_id(self) -> int:
@@ -41,17 +42,11 @@ VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         #if the first value is null i.e. no row in table then executes or statemens and adds 0 to 1
 
 
-    def get_mng_id(self, uid : int) -> int:
-        cursor = self.db_conn.cursor()
-        return cursor.execute('SELECT emp_mng_id FROM emp_details WHERE emp_id=?;', uid).fetchone().emp_mng_id
-        #fetchone returns first row of db, .emp_mng_id returns the corresponding row value
-
-
     def write(self, request: NewBooking) -> bool:
         cursor = self.db_conn.cursor()
         cursor.execute(self.write_template, self.get_id(), request.uid, request.travelPurpose,
         request.expectedDistance, request.pickupDateTime, request.pickupVenue,
-        request.arrivalDateTime, request.additionalInfo, self.get_mng_id(request.uid),
+        request.arrivalDateTime, request.additionalInfo, request.managerID,
         request.reqDateTime)
         
         cursor.commit()
