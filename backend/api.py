@@ -12,11 +12,11 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-# from mail import email_manager, email_requests
-# from login_handler import db_handler as db_emp_det
-# from booking_handler import db_handler as db_book_inf
-# from vehicle_handler import db_handler as db_veh_info
-from fake_db import db_emp_det, db_book_inf
+from mail import email_manager, email_requests
+from login_handler import db_handler as db_emp_det
+from booking_handler import db_handler as db_book_inf
+from vehicle_handler import db_handler as db_veh_info
+# from fake_db import db_emp_det, db_book_inf
 
 import json
 from datetime import datetime, date
@@ -176,8 +176,25 @@ def setResponseStatus(res: setBookingStatus, response: Response):
     try:
         db_book_inf().set_approval_status(res.bookingID, res.status)
         
-        data_packet = 
-        email_manager.email_handler(, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
+        booking_details = db_book_inf().get_row_by_booking_id()
+        emp_details = db_emp_det().read(booking_details.emp_id)
+
+        data_packet = {
+            'empName': emp_details.emp_name,
+            'travPurpose': booking_details.trav_purpose,
+            'status': res.status,
+            'additionalComments': res.comments,
+            'receiverEmail': emp_details.emp_email
+        }
+        email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
+
+        if res.status:
+            admin_details = db_emp_det().get_admin_details(emp_details.emp_loc)
+            data_packet = {
+                'empName': emp_details.emp_name,
+            }
+            email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
+
         response.status_code = status.HTTP_202_ACCEPTED
         return "Status Set"
     except Exception as e:
@@ -276,7 +293,6 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
         return
 
     try:
-        pass
         db_veh_info().write_admin_packet(req)
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

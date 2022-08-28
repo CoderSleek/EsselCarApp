@@ -71,10 +71,14 @@ class db_handler:
         return cursor.execute("SELECT * FROM booking_info ORDER BY request_date_time DESC;")
 
 
-    def get_approval_status(self, bid: int) -> bool:
+    def get_row_by_booking_id(self, bid: int) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
-        isApproved = cursor.execute('SELECT approval_status FROM booking_info WHERE booking_id=?', bid).fetchone()
-        return isApproved[0] == True
+        return cursor.execute("SELECT * FROM booking_info WHERE booking_id=?", bid).fetchone()
+
+
+    def get_approval_status(self, bid: int) -> bool | None:
+        isApproved = self.get_row_by_booking_id(bid).approval_status
+        return isApproved
 
     
     def get_mng_req(self, mng_id: int) -> pyodbc.Row:
