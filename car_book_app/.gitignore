@@ -47,4 +47,5 @@ app.*.map.json
 /android/app/release
 
 __pycache__/
-__pycache__/fake_db.cpython-310.pyc
+__pycache__
+/backend/__pycache__

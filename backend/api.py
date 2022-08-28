@@ -12,11 +12,11 @@ from typing import Optional
 from pathlib import Path
 
 import jwt_handler as jwt
-from mail import email_manager, email_requests
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
-from vehicle_handler import db_handler as db_veh_info
-# from fake_db import db_emp_det, db_book_inf
+# from mail import email_manager, email_requests
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+# from vehicle_handler import db_handler as db_veh_info
+from fake_db import db_emp_det, db_book_inf
 
 import json
 from datetime import datetime, date
@@ -158,7 +158,7 @@ def createNewbooking(req: NewBooking, response: Response):
                 'travPurpose': req.travelPurpose,
                 'receiverEmail': manager_details.emp_email
             }
-            email_manager().email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
+            email_manager.email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
     except err:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
@@ -175,10 +175,12 @@ def setResponseStatus(res: setBookingStatus, response: Response):
 
     try:
         db_book_inf().set_approval_status(res.bookingID, res.status)
+        
+        data_packet = 
+        email_manager.email_handler(, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
         response.status_code = status.HTTP_202_ACCEPTED
         return "Status Set"
     except Exception as e:
-        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
