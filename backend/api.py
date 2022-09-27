@@ -296,7 +296,13 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
 
     try:
         db_veh_info().write_admin_packet(req)
-        emp_details = db_emp_det.read()
+        booking_details = db_book_inf.get_row_by_booking_id(req.bookingID)
+        emp_details = db_emp_det.read(booking_details.emp_id)
+        data_packet = {
+            'empName' : emp_details.emp_name,
+            'travPurpose' : booking_details.trav_purpose,
+            'recieverEmail' : emp_details.emp_email,
+        }
         email_manager.email_handler(data_packet, email_handler.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
