@@ -191,7 +191,9 @@ def setResponseStatus(res: setBookingStatus, response: Response):
         if res.status:
             admin_details = db_emp_det().get_admin_details(emp_details.emp_loc)
             data_packet = {
+                'admName': admin_details.emp_name,
                 'empName': emp_details.emp_name,
+                'recieverEmail' : admin_details.emp_email,
             }
             email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
 
@@ -294,6 +296,8 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
 
     try:
         db_veh_info().write_admin_packet(req)
+        emp_details = db_emp_det.read()
+        email_manager.email_handler(data_packet, email_handler.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
