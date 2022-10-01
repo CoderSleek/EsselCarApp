@@ -41,14 +41,14 @@ class email_manager:
     @staticmethod
     def send_email(reciever_email: str, body: str, subject: str):
         # with smtplib.SMTP('smtp.gmail.com', 587) as smt:
-        # with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smt:
-        with smtplib.SMTP('localhost', 1025) as smt:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smt:
+        # with smtplib.SMTP('localhost', 1025) as smt:
             try:
                 # smt.ehlo()
                 # smt.starttls()
                 # smt.ehlo()
 
-                # smt.login(SENDER_EMAIL_ADDRESS, EMAIL_PASSWORD)
+                smt.login(email_manager.SENDER_EMAIL_ADDRESS, email_manager.EMAIL_PASSWORD)
 
                 msg = EmailMessage()
                 msg['Subject'] = subject
@@ -64,13 +64,11 @@ class email_manager:
     # </html>
     # """, subtype='html')
                 # msg = 'try's
-                # smt.sendmail(SENDER_EMAIL_ADDRESS, reciever_email, msg)
+                # smt.sendmail(email_manager.SENDER_EMAIL_ADDRESS, reciever_email, msg)
                 smt.send_message(msg)
-
-                # print('done')
-            except err:
-                pass
-                # print('failed', err)
+            except Exception as e:
+                print('failed', e)
+                exit()
 
 
     @staticmethod

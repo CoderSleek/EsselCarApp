@@ -26,20 +26,20 @@ class db_handler:
         )
 
         self.read_template = '''\
-SELECT {0} FROM vehicle_info WHERE {1}=?;'''
+SELECT {0} FROM vehicle_info WHERE booking_id=?;'''
 
         self.write_template = '''\
 INSERT INTO vehicle_info (booking_id, veh_reg_num, veh_model, insurance_validity, puc_expiry,\
  driver_name, driver_address, driver_contact, license_expiry, license_num, trav_agent_contact)\
  values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
 
-        self.read_template = '''\
-SELECT * FROM vehicle_info WHERE booking_id=?'''
+#         self.read_template = '''\
+# SELECT * FROM vehicle_info WHERE booking_id=?'''
 
 
-    def filled(self, id : int) -> bool:
+    def filled(self, booking_id : int) -> bool:
         cursor = self.db_conn.cursor()
-        item = cursor.execute(self.read_template.format('*', 'booking_id'), id).fetchone()
+        item = cursor.execute(self.read_template.format('booking_id'), booking_id).fetchone()
         return item != None
 
 
@@ -65,3 +65,14 @@ SELECT * FROM vehicle_info WHERE booking_id=?'''
     def get_single_booking(self, bookingID: int) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
         return cursor.execute(self.read_template, bookingID).fetchone()
+
+    
+    def get_time_data(self, booking_id: int) -> bool:
+        if not self.filled(booking_id):
+            return False
+
+        cursor = self.db_conn.cursor()
+        time_data = cursor.execute(self.read_template.format('start_dist'), booking_id).fetchone()
+
+        # return time_data if time_data[0] != None else None
+        return time_data == None

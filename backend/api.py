@@ -53,8 +53,8 @@ class VehicleInfoPacket(BaseModel):
     pucExpDate: date
     driverName: str
     driverAddress: str
-    driverContact: int
     licenseNum: str
+    driverContact: int
     travAgentContact: Optional[int | None]
 
 
@@ -145,13 +145,14 @@ def createNewbooking(req: NewBooking, response: Response):
         req.reqDateTime = str(datetime.now()).split('.')[0]
         manager_details = db_emp_det().get_mng_details(req.uid)
         req.managerID = manager_details.emp_id
-    except:
+    except Exception as e:
+        print(e)
         response.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return "Bad Request"
         
     try:
-        status = db_book_inf().write(req)
-        if status:
+        approval_status = db_book_inf().write(req)
+        if approval_status:
             data_packet = {
                 'mngName': manager_details.emp_name,
                 'empName': db_emp_det().read(req.uid).emp_name,
@@ -159,26 +160,24 @@ def createNewbooking(req: NewBooking, response: Response):
                 'receiverEmail': manager_details.emp_email
             }
             email_manager.email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
-    except err:
+    except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
 
 @app.put('/approval', tags=['Employee'])
 def setResponseStatus(res: setBookingStatus, response: Response):
-    print(res)
     if res.comments != '':
         res.comments = res.comments.strip(' ')
         if not re.match('^[\w .-]+$',res.comments):
             response.status_code = status.HTTP_406_NOT_ACCEPTABLE
-            return "Inavlid Comment"
+            return "Invalid Comment"
 
     try:
         db_book_inf().set_approval_status(res.bookingID, res.status)
         
-        booking_details = db_book_inf().get_row_by_booking_id()
+        booking_details = db_book_inf().get_row_by_booking_id(res.bookingID)
         emp_details = db_emp_det().read(booking_details.emp_id)
-
         data_packet = {
             'empName': emp_details.emp_name,
             'travPurpose': booking_details.trav_purpose,
@@ -189,17 +188,19 @@ def setResponseStatus(res: setBookingStatus, response: Response):
         email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
 
         if res.status:
-            admin_details = db_emp_det().get_admin_details(emp_details.emp_loc)
-            data_packet = {
-                'admName': admin_details.emp_name,
-                'empName': emp_details.emp_name,
-                'recieverEmail' : admin_details.emp_email,
-            }
-            email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
+            admin_details_list = db_emp_det().get_admin_details(emp_details.emp_loc)
+            for single_admin in admin_details_list:
+                data_packet = {
+                    'admName': single_admin.emp_name,
+                    'empName': emp_details.emp_name,
+                    'receiverEmail' : single_admin.emp_email,
+                }
+                email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
 
         response.status_code = status.HTTP_202_ACCEPTED
         return "Status Set"
     except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
@@ -211,18 +212,24 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
         for i in range(len(rows_list)):
             pickupDateTime = rows_list[i].pickup_date_time.strftime("%I:%M %p %d-%m-%Y")
             arrivalDateTime = rows_list[i].arrival_date_time.strftime("%I:%M %p %d-%m-%Y")
-
-            rows_list[i] = {'uid' : rows_list[i].emp_id,
+            adminApproval = rows_list[i].approval_status and db_veh_info().get_time_data(rows_list[i].booking_id)
+            
+            rows_list[i] = {
+            'uid' : rows_list[i].emp_id,
             'travelPurpose': rows_list[i].trav_purpose,
             'expectedDistance': rows_list[i].expected_dist,
             'pickupDateTime': pickupDateTime,
             'pickupVenue': rows_list[i].pickup_venue,
             'arrivalDateTime': arrivalDateTime,
             'additionalInfo': rows_list[i].additional_info,
-            'approvalStatus': rows_list[i].approval_status}
+            'approvalStatus': rows_list[i].approval_status,
+            'isAdminApproved': adminApproval
+            }
+            print(rows_list[i])
 
         return rows_list
     except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
@@ -296,15 +303,16 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
 
     try:
         db_veh_info().write_admin_packet(req)
-        booking_details = db_book_inf.get_row_by_booking_id(req.bookingID)
-        emp_details = db_emp_det.read(booking_details.emp_id)
+        booking_details = db_book_inf().get_row_by_booking_id(req.bookingID)
+        emp_details = db_emp_det().read(booking_details.emp_id)
         data_packet = {
             'empName' : emp_details.emp_name,
             'travPurpose' : booking_details.trav_purpose,
-            'recieverEmail' : emp_details.emp_email,
+            'receiverEmail' : emp_details.emp_email,
         }
-        email_manager.email_handler(data_packet, email_handler.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
+        email_manager.email_handler(data_packet, email_requests.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
     except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
@@ -361,7 +369,7 @@ def getManagerRequests(emp_id: int, response: Response):
                 'pickupVenue': rows[index].pickup_venue,
                 'arrivalDateTime': arrivalDateTime,
                 'additionalInfo': rows[index].additional_info,
-                'approvalStatus': rows[index].approval_status
+                'isApproved': rows[index].approval_status
             }
         return rows
 
@@ -371,7 +379,7 @@ def getManagerRequests(emp_id: int, response: Response):
 
 def validate_packet(req):
     special_char_regex = re.compile('^[A-Za-z0-9 -]*$')
-    list_of_char_limits = [50, 100, 50, 200, 50, 10, 10]
+    list_of_char_limits = [50, 100, 50, 200, 50]
 
     if not db_book_inf().get_approval_status(req[0]):
         return False
@@ -379,9 +387,9 @@ def validate_packet(req):
     for index in range(1, len(req)-2):
         req[index] = req[index].strip(' ')
         if len(req[index]) == 0 or (not special_char_regex.match(req[index])) or (
-            list_of_char_limits[index] < len(req[index])):
+            list_of_char_limits[index-1] < len(req[index])):
             return False
-    
+
     for index in range(len(req)-2,len(req)):
         if (not (isinstance(req[index], int) and len(str(req[index])) == 10)) and (req[index] is not None):
             return False

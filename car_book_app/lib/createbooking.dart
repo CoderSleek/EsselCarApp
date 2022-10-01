@@ -306,6 +306,8 @@ class _CreateBookingState extends State<CreateBooking> {
                       return "Distance cannot be empty";
                     } else if (!isValid.hasMatch(value)) {
                       return "Can Only contain Numbers";
+                    } else if (double.parse(value) > 9999) {
+                      return "Distance must be less than 9999";
                     }
                     return null;
                   },

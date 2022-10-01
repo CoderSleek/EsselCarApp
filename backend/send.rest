@@ -18,7 +18,7 @@ Content-Type: application/json
 {
     "uid": 1,
     "travelPurpose": "bizness",
-    "expectedDistance": 3,
+    "expectedDistance": 9999,
     "pickupDateTime": "08:00 PM,  21-11-2022",
     "pickupVenue": "office",
     "arrivalDateTime": "01:00 PM,  21-11-2022",
@@ -62,7 +62,7 @@ POST http://localhost:5000/newvehicleinfo
 Content-Type: application/json
 
 {
-        "bookingID": 1,
+        "bookingID": 2,
         "vehRegNum": "abc",
         "vehModel": "some car",
         "licenseExpDate": "2022-09-12",
@@ -72,7 +72,7 @@ Content-Type: application/json
         "driverAddress": "malabaar",
         "licenseNum": "some string",
         "driverContact": 8342023433,
-        "travAgentContact": null
+        "travAgentContact": 1234567890
 }
 
 
@@ -87,3 +87,13 @@ Content-Type: application/json
 ###
 
 GET http://localhost:5000/getmanagerrequests?mng_id=5
+
+###
+
+PUT http://localhost:5000/approval
+
+{   
+    "bookingID":6,
+    "status": false,
+    "comments": ""
+}

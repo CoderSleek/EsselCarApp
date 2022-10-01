@@ -13,7 +13,8 @@ class HistoryData {
   late String pickupVenue;
   late String arrivalDateTime;
   late String? additionalInfo;
-  late bool? isApproved;
+  late bool? isManagerApproved;
+  late bool? isAdminApproved;
 
   HistoryData.fromJson(Map<String, dynamic> item) {
     uid = item['uid'];
@@ -21,9 +22,10 @@ class HistoryData {
     expectedDistance = item['expectedDistance'];
     pickupVenue = item['pickupVenue'];
     additionalInfo = item['additionalInfo'];
-    isApproved = item['approvalStatus'];
+    isManagerApproved = item['approvalStatus'];
     pickupDateTime = item['pickupDateTime'];
     arrivalDateTime = item['arrivalDateTime'];
+    isAdminApproved = item['adminApproved'];
     // final RegExp dt = RegExp(r'^([\d]+)-(\d\d)-(\d\d).(\d\d):(\d\d)');
     // RegExpMatch? match = dt.firstMatch(item['pickupDateTime']);
 
@@ -71,10 +73,8 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Row(
-          children: [
-            Text(widget.data.travelPurpose),
-          ],
+        title: SingleChildScrollView(
+          child: Text(widget.data.travelPurpose),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,12 +83,14 @@ class _HistoryWidgetState extends State<HistoryWidget> {
             Text('Time: ${widget.data.pickupDateTime}'),
           ],
         ),
-        enabled: widget.data.isApproved == true,
+        enabled: widget.data.isManagerApproved == true,
         isThreeLine: true,
         trailing: Text(
-          widget.data.isApproved == null
+          widget.data.isManagerApproved == null
               ? "Not Updated"
-              : (widget.data.isApproved == true ? "Accepted" : "Rejected"),
+              : (widget.data.isManagerApproved == true
+                  ? "Accepted"
+                  : "Rejected"),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         dense: true,
