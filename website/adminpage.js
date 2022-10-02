@@ -286,8 +286,8 @@ async function createViewInfoModal(){
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({'bookingID':booking_id})
     });  
-    element_data = await element_data.json()
-
+    element_data = await element_data.json();
+    console.log(element_data);
     const modal = document.getElementById('modal');
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>

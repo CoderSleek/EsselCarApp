@@ -33,8 +33,8 @@ INSERT INTO vehicle_info (booking_id, veh_reg_num, veh_model, insurance_validity
  driver_name, driver_address, driver_contact, license_expiry, license_num, trav_agent_contact)\
  values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
 
-#         self.read_template = '''\
-# SELECT * FROM vehicle_info WHERE booking_id=?'''
+        self.write_template2 = ('''
+        UPDATE vehicle_info SET start_dist=?, end_dist=?, in_time=?, out_time=? WHERE booking_id=?''')
 
 
     def filled(self, booking_id : int) -> bool:
@@ -64,7 +64,7 @@ INSERT INTO vehicle_info (booking_id, veh_reg_num, veh_model, insurance_validity
 
     def get_single_booking(self, bookingID: int) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
-        return cursor.execute(self.read_template, bookingID).fetchone()
+        return cursor.execute(self.read_template.format('*'), bookingID).fetchone()
 
     
     def get_time_data(self, booking_id: int) -> bool:
@@ -73,6 +73,15 @@ INSERT INTO vehicle_info (booking_id, veh_reg_num, veh_model, insurance_validity
 
         cursor = self.db_conn.cursor()
         time_data = cursor.execute(self.read_template.format('start_dist'), booking_id).fetchone()
-
         # return time_data if time_data[0] != None else None
-        return time_data == None
+        return time_data[0] == None
+
+    
+    def write_time_data(self, packet) -> bool:
+        if not self.filled(packet.bookingID):
+            return False
+
+        cursor = self.db_conn.cursor()
+        cursor.execute(self.write_template2, packet.inDist, packet.outDist, packet.inTime, packet.outTime, packet.bookingID)
+        cursor.commit()
+        return True

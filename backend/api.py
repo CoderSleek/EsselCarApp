@@ -19,7 +19,7 @@ from vehicle_handler import db_handler as db_veh_info
 # from fake_db import db_emp_det, db_book_inf
 
 import json
-from datetime import datetime, date
+from datetime import datetime, date, time
 import re
 
 class LoginRequest(BaseModel):
@@ -69,10 +69,19 @@ class tokenType(BaseModel):
 class vehicleInfo(BaseModel):
     bookingID: int
 
+
 class setBookingStatus(BaseModel):
-    bookingID:int
+    bookingID: int
     status: bool
     comments: str
+
+
+class TimeData(BaseModel):
+    bookingID: int
+    inTime: str
+    outTime: str
+    inDist: float
+    outDist: float
 
 
 app = FastAPI()
@@ -212,10 +221,10 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
         for i in range(len(rows_list)):
             pickupDateTime = rows_list[i].pickup_date_time.strftime("%I:%M %p %d-%m-%Y")
             arrivalDateTime = rows_list[i].arrival_date_time.strftime("%I:%M %p %d-%m-%Y")
-            adminApproval = rows_list[i].approval_status and db_veh_info().get_time_data(rows_list[i].booking_id)
+            canFillTime = db_veh_info().get_time_data(rows_list[i].booking_id)
             
             rows_list[i] = {
-            'uid' : rows_list[i].emp_id,
+            'bookingID' : rows_list[i].booking_id,
             'travelPurpose': rows_list[i].trav_purpose,
             'expectedDistance': rows_list[i].expected_dist,
             'pickupDateTime': pickupDateTime,
@@ -223,9 +232,8 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
             'arrivalDateTime': arrivalDateTime,
             'additionalInfo': rows_list[i].additional_info,
             'approvalStatus': rows_list[i].approval_status,
-            'isAdminApproved': adminApproval
+            'canFillTime': canFillTime
             }
-            print(rows_list[i])
 
         return rows_list
     except Exception as e:
@@ -325,7 +333,6 @@ async def retrieveVehicleData(req: vehicleInfo, response: Response):
             response.status_code = status.HTTP_404_NOT_FOUND
             return "Bad Request"
 
-        
         return_token = {
             'bookingID': vehicle_info.booking_id,
             'vehRegNum': vehicle_info.veh_reg_num,
@@ -340,12 +347,14 @@ async def retrieveVehicleData(req: vehicleInfo, response: Response):
             'travAgentContact': vehicle_info.trav_agent_contact,
             'inDist': vehicle_info.start_dist,
             'outDist': vehicle_info.end_dist,
-            'inTime': vehicle_info.in_time,
-            'outTime': vehicle_info.out_time,
+            'inTime': None if vehicle_info.in_time is None else vehicle_info.in_time.strftime('%I:%M %p'),
+            'outTime': None if vehicle_info.out_time is None else vehicle_info.out_time.strftime('%I:%M %p'),
         }
         return return_token
     except Exception as e:
+        print(e)
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 
 @app.get('/getmanagerrequests', tags=['Employee'])
@@ -395,6 +404,20 @@ def validate_packet(req):
             return False
 
     return True
+
+
+@app.put('/travelData', tags=['Employee'])
+def insertTimeData(req: TimeData, response: Response):
+    req.inTime = datetime.strptime(req.inTime, '%I:%M %p').time()
+    req.outTime = datetime.strptime(req.outTime, '%I:%M %p').time()
+
+    try:
+        db_veh_info().write_time_data(req)
+        response.status_code = status.HTTP_202_ACCEPTED
+        return "success"
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 
 if __name__ == '__main__':
