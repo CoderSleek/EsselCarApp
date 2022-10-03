@@ -48,7 +48,7 @@ class HistoryWidget extends StatefulWidget {
 
   const HistoryWidget({required this.data, this.index = 0});
 
-  static void getHistory() async {
+  static Future<void> getHistory() async {
     histories = [];
     try {
       http.Response res = await http
@@ -107,7 +107,6 @@ class _HistoryWidgetState extends State<HistoryWidget> {
             msg: "Some Error Occured", toastLength: Toast.LENGTH_SHORT);
       }
     } catch (err) {
-      print(err);
       Fluttertoast.showToast(
           msg: "Connectivity Error", toastLength: Toast.LENGTH_SHORT);
     }

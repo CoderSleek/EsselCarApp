@@ -32,12 +32,12 @@ function display_data(){
     const content_box = window.document.querySelector('.content-box');
     content_box.innerHTML = "";
     data.forEach((element, index) => {
+
         const approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected')
-        const itemContent = 
-    `
+        const itemContent = `
         <div class="rowitems">
             <div class="eachitem"><span class="heading">Booking id: </span>${element.bookingID}</div>
-            <div class="eachitem"><span class="heading">User id: </span>${element.empID}</div>
+            <div class="eachitem"><span class="heading">Employee Name: </span>${element.empName}</div>
             <div class="eachitem"><span class="heading">Purpose: </span>${element.travelPurpose}</div>
         </div>
         <div class="rowitems">
@@ -173,7 +173,6 @@ async function sendInfo(){
 
     
     if(res.status == 200){
-        console.log('inside changer');
         const x = data.findIndex((element) => 
         {return element.bookingID === parseInt(idNumber)})
         data[x].hasInfoFilled = true;

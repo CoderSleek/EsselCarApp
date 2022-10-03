@@ -64,12 +64,3 @@ class db_handler:
         cursor = self.db_conn.cursor()
         rows = cursor.execute("SELECT * FROM emp_details WHERE position LIKE '%admin%' AND emp_loc=?;", location)
         return rows
-
-# try:
-#     x = db_handler().read(1)
-#     print(x, x._fields)
-#     # for i in x:
-#     #     print(i, i._fields)
-# except Exception as e:
-#     print('hello')
-#     print(e)

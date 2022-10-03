@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StartPage extends StatefulWidget {
-  static int x = 0;
-
   @override
   State<StartPage> createState() => _StartPageState();
 }
@@ -99,14 +97,18 @@ class _StartPageState extends State<StartPage> {
                   ),
                 ),
                 height: isManager ? viewHeight * 0.4 : 0,
-                child: ListView.builder(
-                  itemCount: ManagerApprovalWidget.dataList.length,
-                  itemBuilder: (context, index) {
-                    return ManagerApprovalWidget(
-                      index,
-                    );
-                  },
-                ),
+                child: ManagerApprovalWidget.dataList.isEmpty
+                    ? const Center(
+                        child: Text("No approvals required"),
+                      )
+                    : ListView.builder(
+                        itemCount: ManagerApprovalWidget.dataList.length,
+                        itemBuilder: (context, index) {
+                          return ManagerApprovalWidget(
+                            index,
+                          );
+                        },
+                      ),
               ),
               // Container(
               //   height: isManager ? viewHeight * 0.4 : 0,
@@ -118,14 +120,18 @@ class _StartPageState extends State<StartPage> {
               Container(
                 height: isManager ? viewHeight * 0.6 : viewHeight * 1,
                 color: Color.fromARGB(78, 107, 21, 160),
-                child: ListView.builder(
-                  itemCount: HistoryWidget.histories.length,
-                  itemBuilder: (context, index) {
-                    return HistoryWidget(
-                      data: HistoryWidget.histories[index],
-                    );
-                  },
-                ),
+                child: HistoryWidget.histories.isEmpty
+                    ? const Center(
+                        child: Text("No History"),
+                      )
+                    : ListView.builder(
+                        itemCount: HistoryWidget.histories.length,
+                        itemBuilder: (context, index) {
+                          return HistoryWidget(
+                            data: HistoryWidget.histories[index],
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -159,7 +165,10 @@ class _StartPageState extends State<StartPage> {
                   splashColor: Colors.blue.shade600, //holdcolor
                   highlightColor: Colors.blue.shade700, //fullholdcolor
                   onTap: () {
-                    Navigator.pushNamed(context, MyRoutes.createBooking);
+                    Navigator.pushNamed(context, MyRoutes.createBooking)
+                        .then((value) {
+                      setState(() {});
+                    });
                   },
                   child: AnimatedContainer(
                     // color: Colors.greenAccent,

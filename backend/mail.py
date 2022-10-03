@@ -33,9 +33,10 @@ class email_manager:
 
     @staticmethod
     def email_handler(data_packet, function_enum):
-        calling_function = function_enum
-        body, subject = calling_function(data_packet)
-        email_manager.send_email(data_packet['receiverEmail'], body, subject)
+        # calling_function = function_enum
+        # body, subject = calling_function(data_packet)
+        # email_manager.send_email(data_packet['receiverEmail'], body, subject)
+        pass
     
 
     @staticmethod

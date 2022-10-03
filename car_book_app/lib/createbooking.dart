@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:car_book_app/historywidget.dart';
 import 'package:car_book_app/home_login.dart';
@@ -36,6 +37,7 @@ class _CreateBookingState extends State<CreateBooking> {
   );
 
   final _createBookingKey = GlobalKey<FormState>();
+  static bool isLoading = false;
 
   void validateBookingInformation() {
     if (_createBookingKey.currentState!.validate()) {
@@ -55,20 +57,26 @@ class _CreateBookingState extends State<CreateBooking> {
 
   void sendCreateBookingRequest(Map body) async {
     try {
+      setState(() {
+        isLoading = !isLoading;
+      });
       http.Response response = await http.post(
           Uri.http(MyApp.backendIP, '/newbooking'),
           headers: <String, String>{'Content-Type': 'application/json'},
           body: jsonEncode(body));
 
       if (response.statusCode == 200) {
-        // HistoryWidget.getHistory();
+        await HistoryWidget.getHistory();
         Fluttertoast.showToast(msg: "Success", toastLength: Toast.LENGTH_SHORT);
       } else {
         Fluttertoast.showToast(
             msg: "Error Occured", toastLength: Toast.LENGTH_SHORT);
       }
+      isLoading = !isLoading;
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (err) {
+      isLoading = !isLoading;
       Fluttertoast.showToast(
           msg: "Connectivity Error", toastLength: Toast.LENGTH_SHORT);
     }
@@ -335,8 +343,25 @@ class _CreateBookingState extends State<CreateBooking> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: validateBookingInformation,
-                  child: const Text("Send Information"),
+                  // style: ButtonStyle(),
+                  onPressed: isLoading ? null : validateBookingInformation,
+                  child: isLoading
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Transform.scale(
+                              scale: 0.6,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 3.0,
+                              ),
+                            ),
+                            const Text(
+                              "Please Wait...",
+                              style: TextStyle(color: Colors.deepPurple),
+                            ),
+                          ],
+                        )
+                      : const Text("Send Information"),
                 ),
               ],
             ),

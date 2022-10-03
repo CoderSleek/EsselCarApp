@@ -7,6 +7,10 @@ async function verifyLogin(){
             {method: 'POST', headers:{'Content-Type':'application/json'}, 
             body: JSON.stringify({'uname': uname,'password':pass})});
 
+        if(response.status == 401){
+            alert('Invalid id or password');
+            return;
+        }
         let token = await response.json()
 
         // console.log(body)

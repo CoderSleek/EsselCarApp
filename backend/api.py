@@ -243,9 +243,12 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
 
 
 @app.post('/admincredcheck', tags=['Admin'])
-def adminCredentialValidation(req: AdminLoginRequest) -> str:
+def adminCredentialValidation(req: AdminLoginRequest, response: Response) -> str:
     if req.uname == 'admin' and req.password == 'admin':
         return jwt.signJWT(req.uname, req.password)
+    else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "Unauthorized"
 
 
 @app.get('/adminpage', tags=['Admin'])
@@ -270,7 +273,7 @@ def adminLoginPage(request: Request):
 @app.post('/getbookingrequests', tags=['Admin'])
 def retrieveBookingRequests(page : PageNumber):
 
-    row_list = list
+    row_list = []
     db_rows = db_book_inf().get_rows()
     for i in range(page.num):
         row_list = []
@@ -284,10 +287,11 @@ def retrieveBookingRequests(page : PageNumber):
         pickupDateTime = row_list[i].pickup_date_time.strftime("%I:%M %p %d-%m-%Y")
         arrivalDateTime = row_list[i].arrival_date_time.strftime("%I:%M %p %d-%m-%Y")
         requestDateTime = row_list[i].request_date_time.strftime("%I:%M %p %d-%m-%Y")
+        empName = db_emp_det().read(row_list[i].emp_id).emp_name
 
         row_list[i] = {
             'bookingID': row_list[i].booking_id,
-            'empID' : row_list[i].emp_id,
+            'empName' : empName,
             'travelPurpose': row_list[i].trav_purpose,
             'expectedDist': row_list[i].expected_dist,
             'pickupDateTime': pickupDateTime,

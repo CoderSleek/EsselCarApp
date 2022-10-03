@@ -40,7 +40,7 @@ class ManagerApprovalWidget extends StatefulWidget {
 }
 
 class _ManagerApprovalState extends State<ManagerApprovalWidget> {
-  // bool? isApproved;
+  bool isLoading = false;
   late final Map<dynamic, dynamic> singleData;
   final TextEditingController _comments = TextEditingController();
   // _ManagerApprovalState(int index) {
@@ -60,12 +60,14 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
   }
 
   void sendStatus(bool status) async {
+    setState(() {
+      isLoading = !isLoading;
+    });
     Map<String, dynamic> dataPacket = {
       'bookingID': singleData["bookingID"],
       'status': status,
       'comments': _comments.text
     };
-
     try {
       http.Response res = await http.put(
         Uri.http(MyApp.backendIP, '/approval'),
@@ -81,6 +83,9 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
     } catch (err) {
       Fluttertoast.showToast(msg: "Connection Error");
     }
+    setState(() {
+      isLoading = !isLoading;
+    });
   }
 
   Future openPopup(bool status) => showDialog(
@@ -123,9 +128,9 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                 ),
               ),
               onPressed: () {
+                Navigator.of(context).pop();
                 sendStatus(status);
                 _comments.text = '';
-                Navigator.of(context).pop();
               },
               child: const Text("Yes"),
             ),
@@ -289,13 +294,20 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                         const EdgeInsets.symmetric(horizontal: 15),
                       ),
                     ),
-                    onPressed: () => openPopup(true),
-                    child: const Text(
-                      "Approve",
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
+                    onPressed: () => isLoading ? null : openPopup(true),
+                    child: isLoading
+                        ? Transform.scale(
+                            scale: 0.4,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Approve",
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
@@ -309,13 +321,20 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                         const EdgeInsets.symmetric(horizontal: 15),
                       ),
                     ),
-                    onPressed: () => openPopup(false),
-                    child: const Text(
-                      "Reject",
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
+                    onPressed: () => isLoading ? null : openPopup(false),
+                    child: isLoading
+                        ? Transform.scale(
+                            scale: 0.4,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Reject",
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
                   ),
                 ],
               ),
