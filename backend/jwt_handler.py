@@ -6,18 +6,17 @@ JWT_SECRET = config("secret")
 JWT_ALGORITHM = config("algorithm")
 
 #returns generated tokens
-def token_response(token : str):
-    return {
-        "access token" : token 
-    }
+# def token_response(token : str):
+#     return {
+#         "access token" : token 
+#     }
 
 
-def signJWT(userId : str, password: str):
+def signJWT(userId : int, password: str):
     payload = {
-        "userName" : userId,
+        "userID" : userId,
         "password": password,
-        "expiry" : time.time() + 60
-
+        "expiry" : time.time() + 900
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
@@ -27,5 +26,5 @@ def decodeJWT(token : str):
     try:
         decoded_token = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITHM)
         return decoded_token if decoded_token['expiry'] >= time.time() else None
-    except:
+    except Exception as err:
         return None

@@ -1,9 +1,9 @@
 # from flask import Flask
 from fastapi import FastAPI, Response, status, Request, HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from uvicorn import run
@@ -102,6 +102,8 @@ app.mount('/static', StaticFiles(
 templates = Jinja2Templates(
     # directory='C:/Users/user/Documents/codes/carbookapp/website')
     directory="../website")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
 @app.get('/')
@@ -244,26 +246,45 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
 
 @app.post('/admincredcheck', tags=['Admin'])
 def adminCredentialValidation(req: AdminLoginRequest, response: Response) -> str:
-    if req.uname == 'admin' and req.password == 'admin':
-        return jwt.signJWT(req.uname, req.password)
+    admins_list = db_emp_det().get_all_admin()
+
+    for admin in admins_list:
+        if req.uname == admin.emp_name and req.password == admin.password:
+            return jwt.signJWT(admin.emp_id, admin.password)
     else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Unauthorized"
 
 
 @app.get('/adminpage', tags=['Admin'])
-def adminContentPage(token : str, response: Response, request: Request):
-    try:
-        package = jwt.decodeJWT(token)
-        if package is not None and package['userName'] == 'admin' and package['password'] == 'admin':
-            return templates.TemplateResponse("adminpage.html", {"request":request})
-        else:
-            response.status_code = status.HTTP_403_FORBIDDEN
-            return templates.TemplateResponse("error.html", {"request": request})
-    except Exception as err:
-        response.status_code = status.HTTP_403_FORBIDDEN
-        return templates.TemplateResponse("error.html", {"request": request})
+def adminContentPage(request: Request, response: Response):
+        return templates.TemplateResponse("adminpage.html", {"request": request})
+    # token = request.headers.get('authorization')
+    # authorized = validate_token(token)
+
+    # if authorized != True:
+    #     print('true')
+    #     print(request.headers)
+    #     return RedirectResponse('static/adminpage.html')
+    # else:
+    #     print('false')
+    #     return RedirectResponse('/unlockedpage')
+        # return templates.TemplateResponse("adminpage.html", {"request": request})
+    # except Exception as err:
+    #     response.status_code = status.HTTP_403_FORBIDDEN
+    #     return templates.TemplateResponse("error.html", {"request": request})
     
+
+# @app.get('/unlockedpage', tags=['Admin'])
+# def redirect(request: Request, response: Response):
+#     print('unlockedpage')
+#     return templates.TemplateResponse("adminpage.html", {"request": request})
+
+
+@app.get('/unauthorized', tags=['Admin'])
+def redirect(request: Request, response: Response):
+    return templates.TemplateResponse("error.html", {"request": request}, status_code=308)
+
 
 @app.get('/adminlogin', tags=['Admin'])
 def adminLoginPage(request: Request):
@@ -271,7 +292,12 @@ def adminLoginPage(request: Request):
 
 
 @app.post('/getbookingrequests', tags=['Admin'])
-def retrieveBookingRequests(page : PageNumber):
+def retrieveBookingRequests(page : PageNumber, request: Request, response: Response):
+    token = request.headers.get('authorization')
+
+    if not validate_token(token):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "unauthorized"
 
     row_list = []
     db_rows = db_book_inf().get_rows()
@@ -308,7 +334,12 @@ def retrieveBookingRequests(page : PageNumber):
 
 
 @app.post('/newvehicleinfo', tags=['Admin'])
-def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
+def dispatchVehiclePacket(req: VehicleInfoPacket, request: Request, response : Response):
+    token = request.headers.get('authorization')
+    if not validate_token(token):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "unauthorized"
+
     if not validate_packet([x for x in list(req.__dict__.values()) if not isinstance(x, date)]):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return
@@ -324,12 +355,18 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, response : Response):
         }
         email_manager.email_handler(data_packet, email_requests.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
     except Exception as e:
-        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 
 @app.post('/getvehicleinfo', tags=['Admin'])
-async def retrieveVehicleData(req: vehicleInfo, response: Response):
+async def retrieveVehicleData(req: vehicleInfo, request: Request, response: Response):
+    token = request.headers.get('authorization')
+
+    if not validate_token(token):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "Unauthorized"
+
     try:
         vehicle_info = db_veh_info().get_single_booking(req.bookingID)
 
@@ -422,6 +459,19 @@ def insertTimeData(req: TimeData, response: Response):
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
+
+
+def validate_token(token):
+    try:
+        package = jwt.decodeJWT(token)
+        admin = db_emp_det().read(package['userID'])
+
+        if package is not None and package['password'] == admin.password:
+            return True
+        
+        return False
+    except Exception as err:
+        return False
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ GET http://localhost:5000/history/1
 
 ###
 
-POST http://localhost:5000/admincheck
+POST http://localhost:5000/admincredcheck
 Content-Type: application/json
 
 {"uname":"abcd","password":"efgh"}
@@ -44,9 +44,7 @@ GET http://localhost:5000/adminlogin
 ###
 
 GET http://localhost:5000/adminpage
-Content-Type: application/json
-
-{"token":"randomstuff"}
+Authorization: some_random_token
 
 ###
 

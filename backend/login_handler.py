@@ -64,3 +64,9 @@ class db_handler:
         cursor = self.db_conn.cursor()
         rows = cursor.execute("SELECT * FROM emp_details WHERE position LIKE '%admin%' AND emp_loc=?;", location)
         return rows
+
+
+    def get_all_admin(self) -> pyodbc.Row:
+        cursor = self.db_conn.cursor()
+        rows = cursor.execute("SELECT * FROM emp_details WHERE position LIKE '%admin%'")
+        return rows

@@ -1,22 +1,30 @@
 const BACKEND_URL = 'http://127.0.0.1:5000/';
-let page_number = 1
-let data = [];
+let PAGE_NUMBER = 1
+let DATA = [];
 
 async function get_data(){
-    data = [];
+    DATA = [];
     try{
-        response = await fetch(BACKEND_URL + 'getbookingrequests',
-        {method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({"num":page_number}),
+        let response = await fetch(BACKEND_URL + 'getbookingrequests',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json',
+                'Authorization': sessionStorage.getItem('accessToken')
+            },
+            body: JSON.stringify({"num":PAGE_NUMBER}),
         });
 
-        data = await response.json();
+        if(response.status === 401){
+            window.location.replace('/unauthorized');
+        }
+        DATA = await response.json();
     } catch (err) {
         alert('Connectivity Issue');
+        return;
     }
 
-    if(data.length == 0 || data === undefined || data === null){
+    if(DATA.length == 0 || DATA === undefined || DATA === null){
         window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
         left:50%;right:50%;top:50%;bottom:50%;">
         No Content</span>`;
@@ -26,14 +34,13 @@ async function get_data(){
     display_data();
 }
 
-
 function display_data(){
 
     const content_box = window.document.querySelector('.content-box');
     content_box.innerHTML = "";
-    data.forEach((element, index) => {
+    DATA.forEach((element, index) => {
+        const approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected');
 
-        const approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected')
         const itemContent = `
         <div class="rowitems">
             <div class="eachitem"><span class="heading">Booking id: </span>${element.bookingID}</div>
@@ -75,8 +82,6 @@ function display_data(){
                 new_btn.textContent = 'Set Vehicle Information';
             }
             new_card.appendChild(new_div);
-
-
             // new_card.innerHTML+=
             // `<div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>`
         }
@@ -87,8 +92,9 @@ function display_data(){
 
 function createNewInfoModal(){
     toggle_btns(true);
-    booking_id = event.target.parentNode.parentNode.id;
-    booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
+    //not the correct way of finding booking_id
+    let booking_id = event.target.parentNode.parentNode.id;
+    booking_id = DATA[booking_id.charAt(booking_id.length-1)].bookingID;
 
     const modal = document.getElementById('modal');
     const modalHtml = `
@@ -167,23 +173,34 @@ async function sendInfo(){
     if(packet.travAgentContact == ""){
         packet.travAgentContact = null;
     }
-    const res = await fetch(BACKEND_URL+'newvehicleinfo', {method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(packet)});
 
-    
-    if(res.status == 200){
-        const x = data.findIndex((element) => 
-        {return element.bookingID === parseInt(idNumber)})
-        data[x].hasInfoFilled = true;
-        const view_btn = document.querySelectorAll('.content')[x].querySelector('.btn-class');
-        view_btn.textContent = 'View Vehicle Information';
-        view_btn.removeEventListener('click', createNewInfoModal, true);
-        view_btn.addEventListener('click', createViewInfoModal);
-        toggle_btns(false);
-        togglemodal();
-    } else {
-        alert('error');
+    try{
+        const res = await fetch(BACKEND_URL+'newvehicleinfo',
+        {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization': sessionStorage.getItem('accessToken')
+            },
+            body: JSON.stringify(packet)
+        });
+
+        if(res.status === 401){
+            window.location.replace('/unauthorized');
+        }
+
+        const x = DATA.findIndex((element) => 
+            {return element.bookingID === parseInt(idNumber)})
+            DATA[x].hasInfoFilled = true;
+            const view_btn = document.querySelectorAll('.content')[x].querySelector('.btn-class');
+            view_btn.textContent = 'View Vehicle Information';
+            view_btn.removeEventListener('click', createNewInfoModal, true);
+            view_btn.addEventListener('click', createViewInfoModal);
+            toggle_btns(false);
+            togglemodal();
+    }
+    catch (err){
+        alert('Some error occured');
     }
 }
 
@@ -279,14 +296,29 @@ function toggle_btns(status){
 async function createViewInfoModal(){
     toggle_btns(true);
     let booking_id = event.target.parentNode.parentNode.id;
-    booking_id = data[booking_id.charAt(booking_id.length-1)].bookingID;
+    booking_id = DATA[booking_id.charAt(booking_id.length-1)].bookingID;
 
-    let element_data = await fetch(BACKEND_URL+'getvehicleinfo',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({'bookingID':booking_id})
-    });  
-    element_data = await element_data.json();
-    console.log(element_data);
+    try{
+        let res = await fetch(BACKEND_URL+'getvehicleinfo',
+        {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization': sessionStorage.getItem('accessToken')
+            },
+            body:JSON.stringify({'bookingID':booking_id})
+        });
+
+        if(res.status === 401){
+            window.location.replace('/unauthorized');
+        }
+        element_data = await res.json();
+    } catch (err) {
+        alert('Some error occured');
+        toggle_btns(false);
+        return;
+    }
+
     const modal = document.getElementById('modal');
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
@@ -344,7 +376,7 @@ function assigneventlistener(){
     // btn = document.querySelectorAll('.btn-class');
     const content_view = document.querySelectorAll('.content');
     content_view.forEach((element)=>{
-        const content_view_id = data[element.id.charAt(element.id.length-1)];
+        const content_view_id = DATA[element.id.charAt(element.id.length-1)];
         if(content_view_id.isApproved === true){
             if(content_view_id.hasInfoFilled === true){
                 element.lastElementChild.firstChild.addEventListener('click', createViewInfoModal);
@@ -365,22 +397,23 @@ function assigneventlistener(){
 
 function assignPageNumber(){
     const btn_div = document.querySelector('#pg_num');
-    btn_div.textContent = ` Page Number ${page_number}`;
+    btn_div.textContent = ` Page Number ${PAGE_NUMBER}`;
 }
 
 function prevPage(){
-    if(page_number <= 1) return;
-    page_number -=1;
+    if(PAGE_NUMBER <= 1) return;
+    PAGE_NUMBER -=1;
     initializePage();
 }
 
 function nextPage(){
-    if(data.length == 0) return;
-    page_number += 1;
+    if(DATA.length == 0) return;
+    PAGE_NUMBER += 1;
     initializePage();
 }
 
 function initializePage(){
+    // console.log(sessionStorage.getItem('accessToken'));
     get_data().then(assigneventlistener);
     assignPageNumber();
 }
@@ -394,6 +427,7 @@ function resetInputErrorMsg(){
         element.lastElementChild.classList.add('hide');
     })
 }
+
 
 initializePage();
 document.getElementById('prev_page').addEventListener('click', prevPage);
