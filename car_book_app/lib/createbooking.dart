@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:car_book_app/historywidget.dart';
-import 'package:car_book_app/home_login.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/widgets/mydrawer.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,6 +58,7 @@ class _CreateBookingState extends State<CreateBooking> {
       setState(() {
         isLoading = !isLoading;
       });
+
       http.Response response = await http.post(
           Uri.http(MyApp.backendIP, '/newbooking'),
           headers: <String, String>{'Content-Type': 'application/json'},
@@ -86,7 +85,6 @@ class _CreateBookingState extends State<CreateBooking> {
         height: 200,
         child: CupertinoDatePicker(
           onDateTimeChanged: (val) {
-            // _expectedTime.text = TimeOfDay.fromDateTime(val).format(context);
             arrivalTime = val;
             _expectedTime.text =
                 DateFormat('hh:mm a,  dd-MM-yyyy').format(arrivalTime);
@@ -119,6 +117,7 @@ class _CreateBookingState extends State<CreateBooking> {
 
   @override
   void dispose() {
+    super.dispose();
     _travelPurpose.dispose();
     _dateinput.dispose();
     _selectedTime.dispose();
@@ -126,13 +125,7 @@ class _CreateBookingState extends State<CreateBooking> {
     _additionalInput.dispose();
     _pickupVenue.dispose();
     _expectedDist.dispose();
-    super.dispose();
   }
-
-  // Future<String> fetchPosts() async {
-  //   final response = await http.get(Uri.parse('http://10.0.3.2:5000/'));
-  //   return response.body;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -157,15 +150,6 @@ class _CreateBookingState extends State<CreateBooking> {
             key: _createBookingKey,
             child: Column(
               children: [
-                // Text(_textShow.text),
-                // ElevatedButton(
-                //     onPressed: () async {
-                //       String x = await fetchPosts();
-                //       setState(() {
-                //         _textShow.text = x;
-                //       });
-                //     },
-                //     child: Text("btn")),
                 TextFormField(
                   maxLength: 50,
                   controller: _travelPurpose,
@@ -253,7 +237,6 @@ class _CreateBookingState extends State<CreateBooking> {
                     );
                     if (pickedTime != null) {
                       setState(() {
-                        // _selectedTime.text = pickedTime.format(context);
                         var now = DateTime.now();
                         _selectedTime.text =
                             DateFormat('hh:mm a').format(DateTime(
@@ -282,8 +265,6 @@ class _CreateBookingState extends State<CreateBooking> {
                   decoration: const InputDecoration(
                     icon: Icon(
                       Icons.time_to_leave,
-                      // CupertinoIcons.timer_fill,
-                      // Icons.more_time,
                       color: Colors.blue,
                     ),
                     labelText: "Expected Date & time of arrival",
@@ -343,7 +324,6 @@ class _CreateBookingState extends State<CreateBooking> {
                   ),
                 ),
                 ElevatedButton(
-                  // style: ButtonStyle(),
                   onPressed: isLoading ? null : validateBookingInformation,
                   child: isLoading
                       ? Row(

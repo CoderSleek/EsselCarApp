@@ -3,41 +3,29 @@ async function verifyLogin(){
     const pass = document.getElementById('pass').value;
 
     try{
-        let response = await fetch(backend_url+'admincredcheck',
-            {
-                method: 'POST',
-                headers:{'Content-Type':'application/json'}, 
-                body: JSON.stringify({'uname': uname,'password':pass})
-            });
+        let response = await fetch(BACKEND_URL+'admincredcheck', /*endpoint*/
+        {
+            method: 'POST',
+            headers:{'Content-Type': 'application/json'}, 
+            body: JSON.stringify({'uname': uname,'password':pass})
+        });
 
-        if(response.status == 401){
+        if(response.status == 401){ /*401 not found*/
             alert('Invalid id or password');
             return;
         }
-        let token = await response.json()
+        let token = await response.json(); /*rest call returns jwt token*/
 
         if(token){
             sessionStorage.setItem('accessToken', token);
-            window.location.href = backend_url+'adminpage';
-            // let response = await fetch(backend_url+'adminpage',
-            // {
-            //     method: 'GET',
-            //     headers:{
-            //         'Content-Type':'application/json',
-            //         'Authorization': token,
-            //         'Access-Control-Allow-Origin': 'no-cors',
-            //     }
-            // });
-            // html_text = await response.text();
-            // document.querySelector('html').innerHTML = html_text;
+            window.location.href = BACKEND_URL+'adminpage'; /*change webpage to another html response by endpoint*/
         }
     } catch (err) {
         alert('Some error Occured');
-        console.log(err);
     }
 }
 
-const backend_url = 'http://localhost:5000/';
+const BACKEND_URL = 'http://localhost:5000/';
 
-const logInBtn  = window.document.getElementById('login')
-logInBtn.addEventListener('click', verifyLogin)
+const logInBtn  = window.document.getElementById('login');
+logInBtn.addEventListener('click', verifyLogin);

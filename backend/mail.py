@@ -2,9 +2,9 @@ import smtplib
 from email.message import EmailMessage
 from enum import Enum
 
-class email_manager:
-    SENDER_EMAIL_ADDRESS = 'dnarula7jan@gmail.com'
-    EMAIL_PASSWORD = 'rxujlhwzrhlhudqn'
+class Email_manager:
+    SENDER_EMAIL_ADDRESS = ''
+    EMAIL_PASSWORD = ''
 
     bodies = {
     'new_request': "Dear {0},\n"
@@ -32,93 +32,66 @@ class email_manager:
 
 
     @staticmethod
-    def email_handler(data_packet, function_enum):
-        # calling_function = function_enum
-        # body, subject = calling_function(data_packet)
-        # email_manager.send_email(data_packet['receiverEmail'], body, subject)
-        pass
-    
+    def email_handler(data_packet: dict, function_enum: callable) -> None:
+        calling_function = function_enum
+        body, subject = calling_function(data_packet)
+        Email_manager.send_email(data_packet['receiverEmail'], body, subject)
+
 
     @staticmethod
-    def send_email(reciever_email: str, body: str, subject: str):
-        # with smtplib.SMTP('smtp.gmail.com', 587) as smt:
+    def send_email(reciever_email: str, body: str, subject: str) -> None:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smt:
-        # with smtplib.SMTP('localhost', 1025) as smt:
             try:
-                # smt.ehlo()
-                # smt.starttls()
-                # smt.ehlo()
-
-                smt.login(email_manager.SENDER_EMAIL_ADDRESS, email_manager.EMAIL_PASSWORD)
+                smt.login(Email_manager.SENDER_EMAIL_ADDRESS, Email_manager.EMAIL_PASSWORD)
 
                 msg = EmailMessage()
                 msg['Subject'] = subject
-                msg['From'] = email_manager.SENDER_EMAIL_ADDRESS
+                msg['From'] = Email_manager.SENDER_EMAIL_ADDRESS
                 msg['To'] = reciever_email
                 msg.set_content(body)
-    #             msg.add_alternative("""\
-    # <!DOCTYPE html>
-    # <html>
-    #     <body>
-    #         <a href="www.google.com"><button type=button>click me</button></a>
-    #     </body>
-    # </html>
-    # """, subtype='html')
-                # msg = 'try's
-                # smt.sendmail(email_manager.SENDER_EMAIL_ADDRESS, reciever_email, msg)
+
                 smt.send_message(msg)
             except Exception as e:
-                print('failed', e)
-                exit()
+                pass
 
 
     @staticmethod
-    def new_request_mail(data: dict) -> str:
-        body_string = email_manager.bodies['new_request'].format(data['mngName'], 
+    def new_request_mail(data: dict) -> tuple:
+        body_string = Email_manager.bodies['new_request'].format(data['mngName'], 
         data['empName'], data['travPurpose'])
 
-        return body_string, email_manager.subjects['new_request_subject']
+        return body_string, Email_manager.subjects['new_request_subject']
     
 
     @staticmethod
-    def request_update_mail(data: dict) -> str:
-        body_string = email_manager.bodies['request_update'].format(data['empName'], 
+    def request_update_mail(data: dict) -> tuple:
+        body_string = Email_manager.bodies['request_update'].format(data['empName'], 
         data['travPurpose'], 'Accepted' if data['status'] else 'Rejected')
 
         if data['additionalComments']:
-            body_string += email_manager.bodies['msg_comment'].format(data['additionalComments'])
+            body_string += Email_manager.bodies['msg_comment'].format(data['additionalComments'])
 
-        return body_string, email_manager.subjects['update_subject']
+        return body_string, Email_manager.subjects['update_subject']
 
 
     @staticmethod
-    def admin_request_mail(data: dict) -> str:
-        body_string = email_manager.bodies['admin_update'].format(data['admName'], 
+    def admin_request_mail(data: dict) -> tuple:
+        body_string = Email_manager.bodies['admin_update'].format(data['admName'], 
         data['empName'])
         
-        return body_string, email_manager.subjects['new_request_subject']
+        return body_string, Email_manager.subjects['new_request_subject']
 
 
     @staticmethod
-    def admin_update_mail(data: dict) -> str:
-        body_string = email_manager.bodies['request_completed'].format(data['empName'], 
+    def admin_update_mail(data: dict) -> tuple:
+        body_string = Email_manager.bodies['request_completed'].format(data['empName'], 
         data['travPurpose'])
 
-        return body_string, email_manager.subjects['update_subject']
+        return body_string, Email_manager.subjects['update_subject']
             
 
-class email_requests(Enum):
-    NEW_BOOKING_REQUEST_TO_MANAGER = email_manager.new_request_mail
-    BOOKING_REQUEST_UPDATE_TO_EMPLOYEE = email_manager.request_update_mail
-    BOOKING_REQUEST_UPDATE_TO_ADMIN = email_manager.admin_request_mail
-    ADMIN_UPDATE_EMAIL_TO_EMPLOYEE = email_manager.admin_update_mail
-
-# send_email('devnarula0701@gmail.com')
-
-# email_manager.email_handler({'mngName': 'Nev Darula', 'empName': 'Dev Narula', 'travPurpose':'bakchodi', 'receiverEmail':'nib@gib.com'}, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
-# email_manager.email_handler({'empName': 'Dev Narula', 'travPurpose':'bakchodi', 'status':True, 'additionalComments':'sexy', 'receiverEmail':'nib@gib.com'}, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
-# email_manager.email_handler({'empName': 'Dev Narula', 'travPurpose':'bakchodi', 'status':False, 'additionalComments':None, 'receiverEmail':'nib@gib.com'}, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
-# email_manager.email_handler({'admName': 'devar', 'empName':'dev narula', 'receiverEmail':'nib@gib.com'}, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
-# email_manager.email_handler({'empName': 'Dev Narula', 'travPurpose':'bakchodi', 'receiverEmail':'nib@gib.com'}, email_requests.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
-
-#python -m smtpd -c DebuggingServer -n localhost:1025
+class Email_requests(Enum):
+    NEW_BOOKING_REQUEST_TO_MANAGER = Email_manager.new_request_mail
+    BOOKING_REQUEST_UPDATE_TO_EMPLOYEE = Email_manager.request_update_mail
+    BOOKING_REQUEST_UPDATE_TO_ADMIN = Email_manager.admin_request_mail
+    ADMIN_UPDATE_EMAIL_TO_EMPLOYEE = Email_manager.admin_update_mail

@@ -1,24 +1,26 @@
 const BACKEND_URL = 'http://127.0.0.1:5000/';
-let PAGE_NUMBER = 1
+let PAGE_NUMBER = 1; /*10 items per page, used to get next 10/prev 10 items from server*/
 let DATA = [];
 
+/** fetch json data from api, gets an array */
 async function get_data(){
-    DATA = [];
+    DATA = []; /* reset everytime data is fetched from server */
     try{
         let response = await fetch(BACKEND_URL + 'getbookingrequests',
         {
             method: 'POST',
             headers: {
                 'Content-Type':'application/json',
-                'Authorization': sessionStorage.getItem('accessToken')
+                'Authorization': sessionStorage.getItem('accessToken') ?? '' /*checks for jwt, if not exists send ''*/
             },
-            body: JSON.stringify({"num":PAGE_NUMBER}),
+            body: JSON.stringify({"num": PAGE_NUMBER}),
         });
 
-        if(response.status === 401){
+        if(response.status === 401){ /*invalid jwt response code*/
             window.location.replace('/unauthorized');
         }
-        DATA = await response.json();
+
+        DATA = await response.json(); /* json array */
     } catch (err) {
         alert('Connectivity Issue');
         return;
@@ -28,19 +30,21 @@ async function get_data(){
         window.document.querySelector('.content-box').innerHTML = `<span style="position:relative;
         left:50%;right:50%;top:50%;bottom:50%;">
         No Content</span>`;
-
-        return;
+        return; /* dont display data if empty */
     }
     display_data();
 }
 
+/** load data fetched from api to display in content-box div */
 function display_data(){
-
     const content_box = window.document.querySelector('.content-box');
-    content_box.innerHTML = "";
+    content_box.innerHTML = ""; /* reset content box having dom elements */
+
     DATA.forEach((element, index) => {
+        /* element is an object {} */
         const approvalStatus = element.isApproved == null ? 'No Update' : (element.isApproved == true ? 'Approved' : 'Rejected');
 
+        /** each dom element content to append inside content box */
         const itemContent = `
         <div class="rowitems">
             <div class="eachitem"><span class="heading">Booking id: </span>${element.bookingID}</div>
@@ -61,15 +65,18 @@ function display_data(){
             <div class="eachitem"><span class="heading">Manager ID: </span>${element.mngID}</div>
             <div class="eachitem"><span class="heading">Additional Information: </span>${element.additionalInfo != null ? element.additionalInfo : 'None'}</div>
         </div>
-    `
+    `;
 
-        const new_card = document.createElement('div');
-        new_card.classList = 'content';
-        new_card.id = 'card'+index;
+        
+        const new_card = document.createElement('div'); /** new dom element */
+        new_card.classList = 'content'; /** set class for dom ele, could also use classList.add() */
+        new_card.id = 'card' + index; /* id like card0 card1 etc based on card position */
         new_card.innerHTML += itemContent;
 
         if(element.isApproved === true){
+            /* create button based on a certain property */
             const new_div = document.createElement('div');
+            /* created parent div to center the button */
             new_div.className = 'rowitems';
             const new_btn = document.createElement('button');
             new_btn.type = 'button';
@@ -77,29 +84,34 @@ function display_data(){
             new_div.appendChild(new_btn);
 
             if(element.hasInfoFilled === true){
+                /* create different button based on bool property */
                 new_btn.textContent = 'View Vehicle Information';
+                new_btn.addEventListener('click', createViewInfoModal);
             } else {
                 new_btn.textContent = 'Set Vehicle Information';
+                new_btn.addEventListener('click', createNewInfoModal, true);
+                /* true flag allows to remove event listener later */
             }
             new_card.appendChild(new_div);
-            // new_card.innerHTML+=
-            // `<div class="rowitems"><button type="button" class="btn-class">Set Vehicle Information</button></div>`
         }
 
         content_box.appendChild(new_card);
     });
 }
 
+/** creates modal for content elements whose data does not exist in db */
 function createNewInfoModal(){
-    toggle_btns(true);
-    //not the correct way of finding booking_id
-    let booking_id = event.target.parentNode.parentNode.id;
-    booking_id = DATA[booking_id.charAt(booking_id.length-1)].bookingID;
+    toggle_btns(true); /** disables buttons while modal is open */
+    
+    const content_ele = event.target.parentElement.parentElement; /** get parent div 'content' */
+    /**get position of content element in content-box element */
+    const index_of_content_ele = Array.from(document.querySelectorAll('.content')).indexOf(content_ele);
 
     const modal = document.getElementById('modal');
+    /* content inside modal, created new everytime */
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
-        <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${booking_id}</span>
+        <span style="font-family: 'Segoe UI';">Fill Information For booking id: ${DATA[index_of_content_ele].bookingID}</span>
         <div class="eachrow">
             <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" type="text" maxlength=50>
             <span class="errorMsg hide"></span>
@@ -141,31 +153,36 @@ function createNewInfoModal(){
             <div class="errorMsg hide"></div>
         </div>
         <button type="button" id="submit" class="btn-class" style="left:50%; transform: translate(-50%); margin-top: 18px;">Submit</button>
-        `
-        modal.innerHTML = modalHtml;
-        togglemodal();
-        modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(), toggle_btns(false)});
-        modal.querySelector('#submit').addEventListener('click', sendInfo);
+        `;
+
+    modal.innerHTML = modalHtml;
+    /*turns modal on or off*/
+    togglemodal();
+    /**toggle btns enables/disables buttons when modal is open */
+    /* close-btn closes the modal and enables all buttons on page */
+    modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(); toggle_btns(false)});
+    /**sends newly enetered data to api */
+    modal.querySelector('#submit').addEventListener('click', () => sendInfo(DATA[index_of_content_ele].bookingID));
 }
 
-async function sendInfo(){
-        const idString = event.target.parentNode.children[1].textContent;
-        const idNumber = idString.match(new RegExp("\\d+$"))[0];
+/**send new item data enterd in modal to the server */
+async function sendInfo(bookingID){
 
-        const packet = {
-        "bookingID": idNumber,
-        "vehRegNum": document.getElementById("vehRegNum").value,
-        "vehModel": document.getElementById("vehModel").value,
-        "licenseExpDate": document.getElementById("licenseExp").value,
-        "insuranceExpDate": document.getElementById("insuranceExp").value,
-        "pucExpDate": document.getElementById("pucExp").value,
-        "driverName": document.getElementById("driverName").value,
-        "driverAddress": document.getElementById("driverAddress").value,
-        "driverContact": document.getElementById("driverContact").value,
-        "licenseNum": document.getElementById("licenseNumber").value,
-        "travAgentContact": document.getElementById("travContact").value
+    const packet = {
+    "bookingID": bookingID,
+    "vehRegNum": document.getElementById("vehRegNum").value,
+    "vehModel": document.getElementById("vehModel").value,
+    "licenseExpDate": document.getElementById("licenseExp").value,
+    "insuranceExpDate": document.getElementById("insuranceExp").value,
+    "pucExpDate": document.getElementById("pucExp").value,
+    "driverName": document.getElementById("driverName").value,
+    "driverAddress": document.getElementById("driverAddress").value,
+    "driverContact": document.getElementById("driverContact").value,
+    "licenseNum": document.getElementById("licenseNumber").value,
+    "travAgentContact": document.getElementById("travContact").value
     }
 
+    /**validates data entered */
     if(!validatePacket(packet)){
         return;
     }
@@ -179,43 +196,53 @@ async function sendInfo(){
         {
             method:'POST',
             headers:{
-                'Content-Type':'application/json',
-                'Authorization': sessionStorage.getItem('accessToken')
+                'Content-Type': 'application/json',
+                'Authorization': sessionStorage.getItem('accessToken') ?? ''
             },
             body: JSON.stringify(packet)
         });
 
-        if(res.status === 401){
+        if(res.status === 401){ /* expired jwt */
             window.location.replace('/unauthorized');
         }
 
-        const x = DATA.findIndex((element) => 
-            {return element.bookingID === parseInt(idNumber)})
-            DATA[x].hasInfoFilled = true;
-            const view_btn = document.querySelectorAll('.content')[x].querySelector('.btn-class');
-            view_btn.textContent = 'View Vehicle Information';
-            view_btn.removeEventListener('click', createNewInfoModal, true);
-            view_btn.addEventListener('click', createViewInfoModal);
-            toggle_btns(false);
-            togglemodal();
+        /*index of updated object in DATA */
+        const updated_object_index = DATA.findIndex((element) => 
+        {
+            return element.bookingID === parseInt(bookingID);
+        });
+
+        /** updating dom element of DATA object */
+        DATA[updated_object_index].hasInfoFilled = true;
+        const view_btn = document.querySelectorAll('.content')[updated_object_index].querySelector('.btn-class');
+        view_btn.textContent = 'View Vehicle Information';
+        /*switch event listener of content ele button */
+        view_btn.removeEventListener('click', createNewInfoModal, true);
+        view_btn.addEventListener('click', createViewInfoModal);
+        /* toggle disabled buttons and hide modal */
+        toggle_btns(false);
+        togglemodal();
     }
     catch (err){
         alert('Some error occured');
     }
 }
 
+/* validates data entered in modal, client side validation */
 function validatePacket(packet){
-    let bool_return = {'item':true};
-    resetInputErrorMsg();
+    let bool_return = {'item': true}; /*using object to obtain pass by reference functionality*/
+    resetInputErrorMsg(); /* remove red error messages from modal */
+
     let error_element;
+    /*regex for validation data in modal */
     const alpha_only = new RegExp("^[A-Za-z]+[A-Za-z ]*$");
     const alpha_num = new RegExp("^[A-Za-z0-9]+[A-Za-z0-9 ]*$");
-    // const vehicle_number = new RegExp("^[A-Z]{2}[ -]*[0-9]{1,2}(?: [A-Z])?(?: [A-Z]*)? [0-9]{4}$");
-    // const vehicle_number = new RegExp('^[A-Za-z]{2}[ -]?[0-9]{1,2}[A-Za-z]{1}[ -]?[0-9]{4}$');
     const special = new RegExp("[A-Z]{2}[ 0-9A-Z-]{3,}[0-9]{4}$");
     const number_only = new RegExp('^[0-9]{10}$');
 
+    /* if regex validation is false then call function with error msg, and error element text, also sets bool_return */
     if(!special.test(packet.vehRegNum)){
+        /* next element sibling is a togglable error message next to input field in modal */
         error_element = document.getElementById('vehRegNum').nextElementSibling;
         set_error_msg(error_element, bool_return, 'Enter a Valid Vehicle Plate Number');
     }
@@ -244,6 +271,7 @@ function validatePacket(packet){
         set_error_msg(error_element, bool_return, 'Enter valid Phone number');
     }
 
+    /* different check for data validation and data empty check since different error msg need be displayed*/
     if(packet.vehRegNum.length == 0){
         set_error_msg(document.getElementById('vehRegNum').nextElementSibling, bool_return);
     }
@@ -272,20 +300,27 @@ function validatePacket(packet){
         set_error_msg(document.getElementById('driverContact').nextElementSibling, bool_return);
     }
 
+    /*returns validation outcome*/
     return bool_return.item;
 }
 
+/* unhides error message modal, sets text to error_msg and sets validation to false*/
 function set_error_msg(error_element, bool_return, error_msg = 'Cannot be empty'){
     error_element.textContent = error_msg;
     error_element.classList.remove('hide');
     bool_return.item = false;
 }
 
+/* hide modal after displaying newInfoModal or viewInfoModal */
+/** tried to blur the body a little when modal is visible, didnt work */
 function togglemodal(){
     document.getElementById('modal').classList.toggle('hide');
     document.body.classList.toggle('hide-body');
 }
 
+/* enables and disables button based on modal visibility, accepts bool */
+/**toggles both page change and set/view vehicle info button */
+/**as a side ffect also changes close modal and submit modal button but they are created new everytiem so doesnt matter */
 function toggle_btns(status){
     const btn_list = Array.from(document.getElementsByTagName('button'));
     btn_list.forEach((element)=>{
@@ -293,25 +328,31 @@ function toggle_btns(status){
     })
 }
 
+/** create modal displaying already existing data fetched from api */
 async function createViewInfoModal(){
     toggle_btns(true);
-    let booking_id = event.target.parentNode.parentNode.id;
-    booking_id = DATA[booking_id.charAt(booking_id.length-1)].bookingID;
+    /* gets parent content element for the called view/set vehicle info button */
+    const parent_content_ele = event.target.parentElement.parentElement;
+    /*finds index of said content in content-box parent*/
+    const index_of_content_ele = Array.from(document.querySelectorAll('.content')).indexOf(parent_content_ele);
+    let element_data;
 
     try{
         let res = await fetch(BACKEND_URL+'getvehicleinfo',
         {
-            method:'POST',
-            headers:{
-                'Content-Type':'application/json',
-                'Authorization': sessionStorage.getItem('accessToken')
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': sessionStorage.getItem('accessToken') ?? ''
             },
-            body:JSON.stringify({'bookingID':booking_id})
+            body: JSON.stringify({'bookingID': DATA[index_of_content_ele].bookingID}) /*just getting the booking id*/
         });
 
-        if(res.status === 401){
+        if(res.status === 401){ /*invalid jwt*/
             window.location.replace('/unauthorized');
         }
+
+        /*contains data to display in modal, sent by api*/
         element_data = await res.json();
     } catch (err) {
         alert('Some error occured');
@@ -320,9 +361,10 @@ async function createViewInfoModal(){
     }
 
     const modal = document.getElementById('modal');
+    /* modal html content, recreated everytime*/
     const modalHtml = `
         <button type="button" class="close-btn" id="close-btn">X</button>
-        <span style="font-family: 'Segoe UI';">Viewing Information For booking id: ${booking_id}</span>
+        <span style="font-family: 'Segoe UI';">Viewing Information For booking id: ${DATA[index_of_content_ele].bookingID}</span>
         <div class="eachrow">
             <span class="heading">Vehicle Registration Number: </span><input id="vehRegNum" disabled value="${element_data.vehRegNum}">
         </div>
@@ -367,68 +409,52 @@ async function createViewInfoModal(){
         </div>
         `;
 
-        modal.innerHTML = modalHtml;
-        togglemodal();
-        modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(), toggle_btns(false)});
+    modal.innerHTML = modalHtml;
+    togglemodal();
+    /* close-btn closes the modal and enables all buttons on page */
+    modal.querySelector('.close-btn').addEventListener('click', ()=>{togglemodal(); toggle_btns(false)});
 }
 
-function assigneventlistener(){
-    // btn = document.querySelectorAll('.btn-class');
-    const content_view = document.querySelectorAll('.content');
-    content_view.forEach((element)=>{
-        const content_view_id = DATA[element.id.charAt(element.id.length-1)];
-        if(content_view_id.isApproved === true){
-            if(content_view_id.hasInfoFilled === true){
-                element.lastElementChild.firstChild.addEventListener('click', createViewInfoModal);
-            } else {
-                element.lastElementChild.firstChild.addEventListener('click', createNewInfoModal, true);
-            }
-        }
-    })
-    // btn.forEach((element)=>{
-    //     if(element.hasInfoFilled === true){
-    //         element.addEventListener('click', createViewInfoModal);
-    //     } else {
-    //         console.log(element);
-    //         element.addEventListener('click', createNewInfoModal);
-    //     }
-    // })
-}
-
+/* assigns page number after every fetch data request from api */
 function assignPageNumber(){
     const btn_div = document.querySelector('#pg_num');
     btn_div.textContent = ` Page Number ${PAGE_NUMBER}`;
 }
 
+/* load previous 10 data from api logic*/
 function prevPage(){
     if(PAGE_NUMBER <= 1) return;
-    PAGE_NUMBER -=1;
+    PAGE_NUMBER -= 1;
+    /*fetches new data from api and resets the current page*/
     initializePage();
 }
 
+/* load next 10 data from api logic*/
 function nextPage(){
+    /*does not allow to load if you have displayed all data and no more is left */
     if(DATA.length == 0) return;
     PAGE_NUMBER += 1;
     initializePage();
 }
 
+/* fetches new data and assigns page number*/
 function initializePage(){
-    // console.log(sessionStorage.getItem('accessToken'));
-    get_data().then(assigneventlistener);
+    /*get data async function*/
+    get_data();
     assignPageNumber();
 }
 
+/* reset all the error messages in modal, called everytime submit button is clicked */
 function resetInputErrorMsg(){
     const item_list = document.querySelectorAll('.eachrow');
 
-    // if(item_list[0].lastElementChild.classList.contains('hide')) return;
-
+    /*eachrow lastelementchild is error displaying div*/
     item_list.forEach((element)=>{
         element.lastElementChild.classList.add('hide');
-    })
+    });
 }
 
-
+/*initialize page when script starts and assign function to previous page and next page buttons*/
 initializePage();
 document.getElementById('prev_page').addEventListener('click', prevPage);
 document.getElementById('next_page').addEventListener('click', nextPage);

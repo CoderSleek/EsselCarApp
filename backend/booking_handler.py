@@ -1,6 +1,5 @@
 import pyodbc
 from pydantic import BaseModel
-import datetime
 
 class NewBooking(BaseModel):
     uid: int
@@ -53,7 +52,7 @@ class db_handler:
         return True
 
 
-    def set_approval_status(self, bid : int, value: bool):
+    def set_approval_status(self, bid : int, value: bool) -> bool:
         cursor = self.db_conn.cursor()
         cursor.execute('UPDATE booking_info SET approval_status=? WHERE booking_id=?;', value, bid)
 
@@ -61,12 +60,12 @@ class db_handler:
         return True
 
 
-    def read(self, uid: int, rowcount: int = 5):
+    def read(self, uid: int, rowcount: int = 5) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
         return cursor.execute("SELECT * FROM booking_info WHERE emp_id=? ORDER BY request_date_time DESC;", uid).fetchmany(rowcount)
 
 
-    def get_rows(self):
+    def get_rows(self) -> pyodbc.Row:
         cursor = self.db_conn.cursor()
         return cursor.execute("SELECT * FROM booking_info ORDER BY request_date_time DESC;")
 

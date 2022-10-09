@@ -14,9 +14,6 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
-    // print('before history ${HistoryWidget.histories.length}');
-    // HistoryWidget.getHistory();
-    // print('after history ${HistoryWidget.histories.length}');
     bool isManager =
         MyApp.userInfo['position'].toLowerCase().contains('manager');
     double screenHeight = MediaQuery.of(context).size.height;
@@ -39,57 +36,10 @@ class _StartPageState extends State<StartPage> {
       ),
       body: Stack(
         children: [
-          // FractionallySizedBox(
-          //   heightFactor: isManager ? 0.4 : 0.6,
-          //   // color: Colors.white70,
-          //   // height: 30,
-          //   // constraints: BoxConstraints(minHeight: 100, maxHeight: 300),
-          //   // padding: EdgeInsets.only(top: 30),
-          //   child: Container(
-          //     color: Colors.black,
-          //     child: ListView.builder(
-          //       itemCount: HistoryWidget.histories.length,
-          //       itemBuilder: (context, index) {
-          //         return HistoryWidget(
-          //           data: HistoryWidget.histories[index],
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ),
-          // Column(
-          //   children: [
-          //     Visibility(
-          //       visible: isManager,
-          //       child: Expanded(
-          //         flex: 5,
-          //         child: Container(
-          //           width: double.infinity,
-          //           color: Colors.yellow,
-          //           child: Text(""),
-          //         ),
-          //       ),
-          //     ),
-
-          //     Expanded(
-          //       flex: 5,
-          //       child: Container(
-          //         width: double.infinity,
-          //         color: Colors.red,
-          //         child: Text("data"),
-          //       ),
-          //     ),
-
-          // Padding(
-          //   padding: const EdgeInsets.all(5),
-          //   child:
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                // margin: isManager
-                //     ? const EdgeInsets.only(bottom: 3)
-                //     : const EdgeInsets.all(0),
                 decoration: const BoxDecoration(
                   color: Color.fromRGBO(190, 190, 190, 1),
                   border: Border(
@@ -110,16 +60,9 @@ class _StartPageState extends State<StartPage> {
                         },
                       ),
               ),
-              // Container(
-              //   height: isManager ? viewHeight * 0.4 : 0,
-              //   color: Colors.grey,
-              //   child: Column(
-              //     children: approvalWidgets,
-              //   ),
-              // ),
               Container(
                 height: isManager ? viewHeight * 0.6 : viewHeight * 1,
-                color: Color.fromARGB(78, 107, 21, 160),
+                color: const Color.fromRGBO(190, 190, 190, 1),
                 child: HistoryWidget.histories.isEmpty
                     ? const Center(
                         child: Text("No History"),
@@ -135,43 +78,26 @@ class _StartPageState extends State<StartPage> {
               ),
             ],
           ),
-          // Column(
-          //   children: [
-          //     Flexible(
-          //       // fit: FlexFit.values[1],
-          //       flex: 6,
-          //       child: Container(color: Colors.red),
-          //     ),
-          //     Flexible(
-          //       child: SizedBox(),
-          //       flex: 4,
-          //     )
-          //   ],
-          // ),
-
           Align(
             alignment: FractionalOffset.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Material(
                 color: Colors.blue.shade500,
-                // animationDuration: const Duration(microseconds: 1),
                 borderRadius:
                     BorderRadius.circular(100), //needs to be same as *1
                 child: InkWell(
                   radius: 600, //speed
                   borderRadius: BorderRadius.circular(100), //*1
-                  // focusColor: Colors.white,
                   splashColor: Colors.blue.shade600, //holdcolor
                   highlightColor: Colors.blue.shade700, //fullholdcolor
                   onTap: () {
                     Navigator.pushNamed(context, MyRoutes.createBooking)
                         .then((value) {
-                      setState(() {});
+                      setState(() {}); //reloads the page
                     });
                   },
                   child: AnimatedContainer(
-                    // color: Colors.greenAccent,
                     duration: const Duration(seconds: 1),
                     width: 180,
                     height: 40,
@@ -179,7 +105,6 @@ class _StartPageState extends State<StartPage> {
                     child: Text(
                       "Create a new Booking",
                       style: TextStyle(
-                        // color: Colors.white,
                         inherit: false,
                         fontFamily:
                             GoogleFonts.sora(fontWeight: FontWeight.w600)
@@ -195,7 +120,6 @@ class _StartPageState extends State<StartPage> {
           ),
         ],
       ),
-      // HistoryWidget(data: HistoryWidget.histories[0]),
       drawer: MyDrawer(),
     );
   }

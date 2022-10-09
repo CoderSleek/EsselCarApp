@@ -1,26 +1,22 @@
-# from flask import Flask
-from fastapi import FastAPI, Response, status, Request, HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
+from fastapi import FastAPI, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from uvicorn import run
 from pydantic import BaseModel
 from typing import Optional
-from pathlib import Path
 
 import jwt_handler as jwt
-from mail import email_manager, email_requests
+from mail import Email_manager, Email_requests
 from login_handler import db_handler as db_emp_det
 from booking_handler import db_handler as db_book_inf
 from vehicle_handler import db_handler as db_veh_info
-# from fake_db import db_emp_det, db_book_inf
 
-import json
 from datetime import datetime, date, time
-import re
+from re import findall, match, compile as compile_
+from traceback import format_exc
 
 class LoginRequest(BaseModel):
     uid: int
@@ -58,19 +54,7 @@ class VehicleInfoPacket(BaseModel):
     travAgentContact: Optional[int | None]
 
 
-class PageNumber(BaseModel):
-    num: int
-
-
-class tokenType(BaseModel):
-    token: str
-
-
-class vehicleInfo(BaseModel):
-    bookingID: int
-
-
-class setBookingStatus(BaseModel):
+class SetBookingStatus(BaseModel):
     bookingID: int
     status: bool
     comments: str
@@ -94,16 +78,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount('/static', StaticFiles(
-    # directory="C:/Users/user/Documents/codes/carbookapp/website/static"),
-    directory="../website"),
-    name="static")
+app.mount('/static', StaticFiles(directory="../website"), name="static")
 
-templates = Jinja2Templates(
-    # directory='C:/Users/user/Documents/codes/carbookapp/website')
-    directory="../website")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+templates = Jinja2Templates(directory="../website")
 
 
 @app.get('/')
@@ -112,10 +89,11 @@ def defaultRoute():
 
 
 @app.post('/login', tags=['Employee'])
-def employeeLogin(req: LoginRequest, response : Response):
+def employeeLogin(req: LoginRequest, response : Response) -> dict:
     try:
         db = db_emp_det()
         row = db.read(req.uid) # gets a single row as a named tuple from db
+
         if row is None:
             response.status_code = status.HTTP_404_NOT_FOUND
             return "User Does not exist"
@@ -125,44 +103,40 @@ def employeeLogin(req: LoginRequest, response : Response):
                 'uid': row.emp_id,
                 'name': row.emp_name,
                 'email': row.emp_email,
-                # 'mng_email' : row.mng_email,
                 'position': row.position
             }
         else:
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return "Invalid Credentials"
-    except err:
-        # response.status_code = status.HTTP_400_BAD_REQUEST
+
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
 
 @app.post('/newbooking', tags=['Employee'])
-def createNewbooking(req: NewBooking, response: Response):
-    # x = x.split(',  ')
-    # x.reverse()
-    # x = ' '.join(x)
+def createNewbooking(req: NewBooking, response: Response) -> dict:
     try:
         regex = '^(\d\d:\d\d [A|P]M).+(\d\d)-(\d\d)-([\d]+)'
-        temp = re.findall(regex, req.pickupDateTime)
+        temp = findall(regex, req.pickupDateTime)
         req.pickupDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
-        temp = re.findall(regex, req.arrivalDateTime)
+        temp = findall(regex, req.arrivalDateTime)
         req.arrivalDateTime = '-'.join(temp[0][-1:-4:-1]) + ' ' + temp[0][0]
 
-        # temp = re.findall('^([\d]+-\d\d-\d\d).(\d\d:\d\d)', req.reqDateTime)
-        # req.reqDateTime = ' '.join(temp[0])
-        # temp = re.findall('^([\d]+)-(\d\d)-(\d\d).*(\d\d):(\d\d):(\d\d)', str(datetime.datetime.now()))
         req.reqDateTime = str(datetime.now()).split('.')[0]
         manager_details = db_emp_det().get_mng_details(req.uid)
         req.managerID = manager_details.emp_id
-    except Exception as e:
-        print(e)
+
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_406_NOT_ACCEPTABLE
         return "Bad Request"
         
     try:
         approval_status = db_book_inf().write(req)
+
         if approval_status:
             data_packet = {
                 'mngName': manager_details.emp_name,
@@ -170,17 +144,19 @@ def createNewbooking(req: NewBooking, response: Response):
                 'travPurpose': req.travelPurpose,
                 'receiverEmail': manager_details.emp_email
             }
-            email_manager.email_handler(data_packet, email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
-    except Exception as e:
+            Email_manager.email_handler(data_packet, Email_requests.NEW_BOOKING_REQUEST_TO_MANAGER)
+
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
 
 @app.put('/approval', tags=['Employee'])
-def setResponseStatus(res: setBookingStatus, response: Response):
+def setResponseStatus(res: SetBookingStatus, response: Response) -> dict:
     if res.comments != '':
         res.comments = res.comments.strip(' ')
-        if not re.match('^[\w .-]+$',res.comments):
+        if not match('^[\w .-]+$',res.comments):
             response.status_code = status.HTTP_406_NOT_ACCEPTABLE
             return "Invalid Comment"
 
@@ -196,7 +172,7 @@ def setResponseStatus(res: setBookingStatus, response: Response):
             'additionalComments': res.comments,
             'receiverEmail': emp_details.emp_email
         }
-        email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
+        Email_manager.email_handler(data_packet, Email_requests.BOOKING_REQUEST_UPDATE_TO_EMPLOYEE)
 
         if res.status:
             admin_details_list = db_emp_det().get_admin_details(emp_details.emp_loc)
@@ -206,18 +182,19 @@ def setResponseStatus(res: setBookingStatus, response: Response):
                     'empName': emp_details.emp_name,
                     'receiverEmail' : single_admin.emp_email,
                 }
-                email_manager.email_handler(data_packet, email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
+                Email_manager.email_handler(data_packet, Email_requests.BOOKING_REQUEST_UPDATE_TO_ADMIN)
 
         response.status_code = status.HTTP_202_ACCEPTED
         return "Status Set"
-    except Exception as e:
-        print(e)
+
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
 
 @app.get('/history/{uid}', tags=['Employee'])
-def retrieveUserHistories(uid : int, response: Response) -> list:
+def retrieveUserHistories(uid : int, response: Response) -> list or dict:
     try:
         rows_list = db_book_inf().read(uid)
         for i in range(len(rows_list)):
@@ -239,69 +216,56 @@ def retrieveUserHistories(uid : int, response: Response) -> list:
 
         return rows_list
     except Exception as e:
-        print(e)
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return "Internal Server Error"
 
 
 @app.post('/admincredcheck', tags=['Admin'])
-def adminCredentialValidation(req: AdminLoginRequest, response: Response) -> str:
+def adminCredentialValidation(req: AdminLoginRequest, response: Response) -> dict:
     admins_list = db_emp_det().get_all_admin()
 
-    for admin in admins_list:
-        if req.uname == admin.emp_name and req.password == admin.password:
-            return jwt.signJWT(admin.emp_id, admin.password)
-    else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return "Unauthorized"
+    try:
+        for admin in admins_list:
+            if req.uname == admin.emp_name and req.password == admin.password:
+                return jwt.signJWT(admin.emp_id, admin.password)
+        else:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return "Unauthorized"
+
+    except Exception as err:
+        _write_to_log_file(err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 
 @app.get('/adminpage', tags=['Admin'])
-def adminContentPage(request: Request, response: Response):
-        return templates.TemplateResponse("adminpage.html", {"request": request})
-    # token = request.headers.get('authorization')
-    # authorized = validate_token(token)
-
-    # if authorized != True:
-    #     print('true')
-    #     print(request.headers)
-    #     return RedirectResponse('static/adminpage.html')
-    # else:
-    #     print('false')
-    #     return RedirectResponse('/unlockedpage')
-        # return templates.TemplateResponse("adminpage.html", {"request": request})
-    # except Exception as err:
-    #     response.status_code = status.HTTP_403_FORBIDDEN
-    #     return templates.TemplateResponse("error.html", {"request": request})
-    
-
-# @app.get('/unlockedpage', tags=['Admin'])
-# def redirect(request: Request, response: Response):
-#     print('unlockedpage')
-#     return templates.TemplateResponse("adminpage.html", {"request": request})
+def adminContentPage(request: Request, response: Response) -> templates.TemplateResponse:
+    return templates.TemplateResponse("adminpage.html", {"request": request})
 
 
 @app.get('/unauthorized', tags=['Admin'])
-def redirect(request: Request, response: Response):
+def redirect(request: Request, response: Response) -> templates.TemplateResponse:
     return templates.TemplateResponse("error.html", {"request": request}, status_code=308)
 
 
 @app.get('/adminlogin', tags=['Admin'])
-def adminLoginPage(request: Request):
+def adminLoginPage(request: Request, response: Response) -> templates.TemplateResponse:
     return templates.TemplateResponse("admin.html", {"request":request})
 
 
 @app.post('/getbookingrequests', tags=['Admin'])
-def retrieveBookingRequests(page : PageNumber, request: Request, response: Response):
+def retrieveBookingRequests(json : dict, request: Request, response: Response) -> dict or list:
     token = request.headers.get('authorization')
 
-    if not validate_token(token):
+    if not _validate_token(token):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "unauthorized"
 
     row_list = []
     db_rows = db_book_inf().get_rows()
-    for i in range(page.num):
+
+    for i in range(json['num']):
         row_list = []
         for j in range(10):
             try:
@@ -334,15 +298,16 @@ def retrieveBookingRequests(page : PageNumber, request: Request, response: Respo
 
 
 @app.post('/newvehicleinfo', tags=['Admin'])
-def dispatchVehiclePacket(req: VehicleInfoPacket, request: Request, response : Response):
+def dispatchVehiclePacket(req: VehicleInfoPacket, request: Request, response : Response) -> dict:
     token = request.headers.get('authorization')
-    if not validate_token(token):
+
+    if not _validate_token(token):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "unauthorized"
 
-    if not validate_packet([x for x in list(req.__dict__.values()) if not isinstance(x, date)]):
+    if not _validate_packet([x for x in list(req.__dict__.values()) if not isinstance(x, date)]):
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return
+        return "invalid packet"
 
     try:
         db_veh_info().write_admin_packet(req)
@@ -353,22 +318,24 @@ def dispatchVehiclePacket(req: VehicleInfoPacket, request: Request, response : R
             'travPurpose' : booking_details.trav_purpose,
             'receiverEmail' : emp_details.emp_email,
         }
-        email_manager.email_handler(data_packet, email_requests.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
-    except Exception as e:
+        Email_manager.email_handler(data_packet, Email_requests.ADMIN_UPDATE_EMAIL_TO_EMPLOYEE)
+
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
 
 
 @app.post('/getvehicleinfo', tags=['Admin'])
-async def retrieveVehicleData(req: vehicleInfo, request: Request, response: Response):
+async def retrieveVehicleData(json: dict, request: Request, response: Response) -> dict:
     token = request.headers.get('authorization')
 
-    if not validate_token(token):
+    if not _validate_token(token):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Unauthorized"
 
     try:
-        vehicle_info = db_veh_info().get_single_booking(req.bookingID)
+        vehicle_info = db_veh_info().get_single_booking(json['bookingID'])
 
         if vehicle_info == None:
             response.status_code = status.HTTP_404_NOT_FOUND
@@ -392,14 +359,15 @@ async def retrieveVehicleData(req: vehicleInfo, request: Request, response: Resp
             'outTime': None if vehicle_info.out_time is None else vehicle_info.out_time.strftime('%I:%M %p'),
         }
         return return_token
-    except Exception as e:
-        print(e)
+
+    except Exception as err:
+        _write_to_log_file(err)
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return
 
 
 @app.get('/getmanagerrequests', tags=['Employee'])
-def getManagerRequests(emp_id: int, response: Response):
+def getManagerRequests(emp_id: int, response: Response) -> list or dict:
     rows = db_book_inf().get_mng_req(emp_id)
 
     if(len(rows) == 0):
@@ -423,12 +391,29 @@ def getManagerRequests(emp_id: int, response: Response):
             }
         return rows
 
-    except Exception as e:
+    except Exception as err:
+        _write_to_log_file(err)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
 
 
-def validate_packet(req):
-    special_char_regex = re.compile('^[A-Za-z0-9 -]*$')
+@app.put('/travelData', tags=['Employee'])
+def insertTimeData(req: TimeData, response: Response) -> dict:
+    req.inTime = datetime.strptime(req.inTime, '%I:%M %p').time()
+    req.outTime = datetime.strptime(req.outTime, '%I:%M %p').time()
+
+    try:
+        db_veh_info().write_time_data(req)
+        response.status_code = status.HTTP_202_ACCEPTED
+        return "success"
+    except Exception as err:
+        _write_to_log_file(err)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return
+
+
+def _validate_packet(req) -> bool:
+    special_char_regex = compile_('^[A-Za-z0-9 -]*$')
     list_of_char_limits = [50, 100, 50, 200, 50]
 
     if not db_book_inf().get_approval_status(req[0]):
@@ -447,31 +432,31 @@ def validate_packet(req):
     return True
 
 
-@app.put('/travelData', tags=['Employee'])
-def insertTimeData(req: TimeData, response: Response):
-    req.inTime = datetime.strptime(req.inTime, '%I:%M %p').time()
-    req.outTime = datetime.strptime(req.outTime, '%I:%M %p').time()
+def _validate_token(token) -> bool:
+    if token == '':
+        return False
 
-    try:
-        db_veh_info().write_time_data(req)
-        response.status_code = status.HTTP_202_ACCEPTED
-        return "success"
-    except Exception as e:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return
-
-
-def validate_token(token):
     try:
         package = jwt.decodeJWT(token)
+
+        if package is None:
+            return False
+
         admin = db_emp_det().read(package['userID'])
 
-        if package is not None and package['password'] == admin.password:
+        if package['password'] == admin.password:
             return True
         
         return False
     except Exception as err:
+        _write_to_log_file(err)
         return False
+
+
+def _write_to_log_file(err: Exception) -> None:
+    with open('logfile.log', 'a') as logfile:
+        exception_detail = format_exc().split('\n')[1:]
+        print(' '.join(exception_detail), file=logfile)
 
 
 if __name__ == '__main__':

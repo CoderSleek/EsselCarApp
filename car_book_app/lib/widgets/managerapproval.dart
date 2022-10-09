@@ -1,10 +1,6 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:car_book_app/main.dart';
-import 'package:car_book_app/startpage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +10,6 @@ class ManagerApprovalWidget extends StatefulWidget {
   static List dataList = [];
 
   late final Map<dynamic, dynamic> singleData;
-  // final int index;
 
   ManagerApprovalWidget(index, {super.key}) {
     singleData = dataList[index];
@@ -43,9 +38,6 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
   bool isLoading = false;
   late final Map<dynamic, dynamic> singleData;
   final TextEditingController _comments = TextEditingController();
-  // _ManagerApprovalState(int index) {
-  //   isApproved = ManagerApprovalWidget.dataList[index]["isApproved"];
-  // }
 
   @override
   void initState() {
@@ -55,25 +47,28 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
 
   @override
   void dispose() {
-    _comments.dispose();
     super.dispose();
+    _comments.dispose();
   }
 
   void sendStatus(bool status) async {
     setState(() {
       isLoading = !isLoading;
     });
+
     Map<String, dynamic> dataPacket = {
       'bookingID': singleData["bookingID"],
       'status': status,
       'comments': _comments.text
     };
+
     try {
       http.Response res = await http.put(
         Uri.http(MyApp.backendIP, '/approval'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(dataPacket),
       );
+
       if (res.statusCode == 202) {
         setState(() {
           singleData["isApproved"] = status;
@@ -112,9 +107,7 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
                   gapPadding: 3),
             ),
           ),
-          // actionsPadding: EdgeInsets.symmetric(vertical: 0.1),
           buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
-          // insetPadding: EdgeInsets.all(80),
           titleTextStyle: TextStyle(
             fontSize: 18,
             color: Colors.black,
@@ -215,57 +208,16 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
               ],
             ),
           ),
-          // actions: [
-          //   ElevatedButton(
-          //       onPressed: () {
-          //         Navigator.of(context).pop();
-          //       },
-          //       child: const Text('ok'))
-          // ],
         ),
       );
 
   @override
   Widget build(BuildContext context) {
-    // isApproved = null;
-
-    // void pr() {
-    //   print(isApproved);
-    // }
-
-    // return Material(
-    //   child: Column(
-    //     children: [
-    //       Text(
-    //         x.toString(),
-    //       ),
-    //       ElevatedButton(
-    //         onPressed: () {
-    //           setState(() {
-    //             x++;
-    //             build(context);
-    //             print(x);
-    //           });
-    //         },
-    //         child: Text("Press"),
-    //       ),
-    //     ],
-    //   ),
-    // );
-
     return Card(
       child: ListTile(
         onTap: openInfoDialog,
         isThreeLine: true,
-        // dense: true,
         enabled: singleData['isApproved'] == null,
-        // enabled: false,
-        // title: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // children: [
-        // Text('Pick up Time ${widget.singleData["pickupDateTime"]}'),
-        // ],
-        // ),
         title: Text('Employee id: ${widget.singleData["empID"]}'),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +225,6 @@ class _ManagerApprovalState extends State<ManagerApprovalWidget> {
             Text(
               "Travel Purpose: ${singleData["travelPurpose"]}",
               style: const TextStyle(
-                // color: Colors.black,
                 height: 1.2,
               ),
             ),

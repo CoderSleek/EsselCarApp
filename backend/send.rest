@@ -40,7 +40,6 @@ Content-Type: application/json
 
 GET http://localhost:5000/adminlogin
 
-
 ###
 
 GET http://localhost:5000/adminpage
@@ -49,36 +48,36 @@ Authorization: some_random_token
 ###
 
 POST http://localhost:5000/getbookingrequests
+Authorization: some_random_token
 Content-Type: application/json
 
 {"num":1}
 
-
 ###
 
 POST http://localhost:5000/newvehicleinfo
+Authorization: some_random_token
 Content-Type: application/json
 
 {
-        "bookingID": 2,
-        "vehRegNum": "abc",
-        "vehModel": "some car",
-        "licenseExpDate": "2022-09-12",
-        "insuranceExpDate": "2022-09-12",
-        "pucExpDate": "2022-09-12",
-        "driverName": "rohan",
-        "driverAddress": "malabaar",
-        "licenseNum": "some string",
-        "driverContact": 8342023433,
-        "travAgentContact": 1234567890
+    "bookingID": 2,
+    "vehRegNum": "abc",
+    "vehModel": "some car",
+    "licenseExpDate": "2022-09-12",
+    "insuranceExpDate": "2022-09-12",
+    "pucExpDate": "2022-09-12",
+    "driverName": "rohan",
+    "driverAddress": "malabaar",
+    "licenseNum": "some string",
+    "driverContact": 8342023433,
+    "travAgentContact": 1234567890
 }
-
 
 ###
 
-
 POST http://127.0.0.1:5000/getvehicleinfo
 Content-Type: application/json
+Authorization: some_random_token
 
 {"bookingID":3}
 

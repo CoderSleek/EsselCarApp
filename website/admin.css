@@ -3,17 +3,9 @@ body{
     padding: 0;
     font-family: "Trirong", serif;
     background-image: url(image5.jpg);
-    /* background-color: aqua; */
-    /* background-size: cover; */
-    /* height: 100%; */
-    /* width: 100%; */
     background-repeat: no-repeat;
     background-position: center;
     font-weight: 900;
-    /* background-position:0px; */
-    /* height: 1200px;
-    width: 1200px; */
-    /* box-sizing: content-box; */
 }
 
 .box{
@@ -27,12 +19,14 @@ body{
     text-align: center;
     border-radius: 10px;
 }
+
 .box h1{
     color: rgb(0, 0, 0);
     font-weight:bold;
     text-transform: upperform;
     font-weight: 900;
 }
+
 .box input[type = "text"],.box input[type = "password"]{
     border:0;
     background: none;
@@ -48,12 +42,12 @@ body{
     transition: 0.25s;
     font-weight: 800;
 }
+
 .box input[type = "text"]:focus,.box input[type = "password"]:focus{
    width:280px;
    border-color:#D9515EFF; 
-   
-
 }
+
 .box input[type = "submit"]{
     border:0;
     background: none;
@@ -67,11 +61,10 @@ body{
     border-radius: 24px;
     transition: 0.25s;
     cursor: pointer;
-    background: #cca1e6; 
-    /* background-color: darkorchid; */
+    background: #cca1e6;
 }
+
 .box input[type = "submit"]:hover{
     background: #B491C8; 
     font-weight: 900;
-
 }

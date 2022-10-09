@@ -1,7 +1,4 @@
-// import 'dart:html';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'package:car_book_app/historywidget.dart';
 import 'package:car_book_app/main.dart';
@@ -26,31 +23,13 @@ class _LoginPageState extends State<LoginPage> {
 
   final _loginFormKey = GlobalKey<FormState>();
 
-  // bool _validUid() {
-  //   if (_uid.isNotEmpty && _isvalid.hasMatch(_uid)) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
-  // bool _validPas() {
-  //   if (_pas.isNotEmpty && _isvalid.hasMatch(_pas)) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
   void validateLogin() async {
     if (_loginFormKey.currentState!.validate()) {
       if (await sendLoginRequest(Uri.http(MyApp.backendIP, '/login'))) {
         setState(() {
           changeButton = true;
         });
-        // MyApp.userInfo = {
-        //   'uid': 1,
-        //   'name': 'Dev Narula',
-        //   'email': '@gmail.com'
-        // };
+
         await Future.delayed(const Duration(milliseconds: 500));
         // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, MyRoutes.startRoute);
@@ -60,18 +39,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<bool> sendLoginRequest(Uri uri) async {
     Map body = {'uid': _uid.text, 'password': _pas.text};
-    // try {
-    //   body = {'uid': int.tryParse(_uid.text), 'password': _pas.text};
-    // } catch (err) {
-    //   Fluttertoast.showToast(
-    //     msg: "User Id Must only be numbers",
-    //     gravity: ToastGravity.CENTER,
-    //     toastLength: Toast.LENGTH_SHORT,
-    //     timeInSecForIosWeb: 1,
-    //   );
-    //   return false;
-    // }
     late http.Response response;
+
     try {
       response = await http.post(
         uri,
@@ -82,12 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       Fluttertoast.showToast(msg: "Connectivity Error");
       return false;
     }
-    // final response = await http.post(Uri.http('127.0.0.1:5000', '/login'),
-    //     headers: <String, String>{
-    //       'Content-Type': 'application/json; charset=UTF-8',
-    //     },
-    //     body: jsonEncode({'uid': 1, 'password': '123456'}));
-    // print(response.body);
+
     try {
       if (response.statusCode == 200) {
         MyApp.userInfo = jsonDecode(response.body);
@@ -120,9 +84,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    super.dispose();
     _uid.dispose();
     _pas.dispose();
-    super.dispose();
   }
 
   @override
@@ -138,115 +102,97 @@ class _LoginPageState extends State<LoginPage> {
           ),
           "Car Booking App",
         ),
-        // backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 12,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 12,
+            ),
+            Image.asset(
+              'assets/login.png',
+              height: 130,
+            ),
+            Text(
+              "Welcome",
+              style: TextStyle(
+                color: Colors.blueAccent,
+                fontSize: 32,
+                fontFamily: GoogleFonts.pacifico().fontFamily,
               ),
-              Image.asset(
-                'assets/login.png',
-                height: 130,
-                // width: 300,
-                // fit: BoxFit.contain,
-              ),
-              Text(
-                "Welcome",
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 32,
-                  fontFamily: GoogleFonts.pacifico().fontFamily,
-                  // fontWeight: FontWeight.bold,
-                  // color: Colors.blue,
-                  // fontFamilyFallback: ["Times new Roman"],
-                ),
-                softWrap: false,
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                child: Form(
-                  key: _loginFormKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _uid,
-                        maxLength: 30,
-                        decoration: const InputDecoration(
-                          icon: Icon(
-                            Icons.person,
-                            // color: Color.fromRGBO(255, 111, 97, 1.00),
-                            color: Colors.blue,
-                          ),
-                          hintText: "Enter Employee ID",
-                          labelText: "User ID",
+              softWrap: false,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+              child: Form(
+                key: _loginFormKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _uid,
+                      maxLength: 30,
+                      decoration: const InputDecoration(
+                        icon: Icon(
+                          Icons.person,
+                          color: Colors.blue,
                         ),
-                        validator: (value) {
-                          final RegExp isvaliduid = RegExp(r'^[0-9]+$');
-                          return validateInputs(value, "ID",
-                              "non numeric charachter", isvaliduid);
-                        },
+                        hintText: "Enter Employee ID",
+                        labelText: "User ID",
                       ),
-                      TextFormField(
-                        maxLength: 30,
-                        controller: _pas,
-                        decoration: const InputDecoration(
-                          icon: Icon(
-                            Icons.lock,
-                            color: Colors.blue,
-                          ),
-                          hintText: "Enter Employee password",
-                          labelText: "Password",
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          RegExp isvalid = RegExp(r'^[a-zA-Z0-9\*\#\$\&]+$');
-                          return validateInputs(
-                              value, "Password", "special charachters", isvalid,
-                              numOfChars: 6);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: validateLogin,
-                style: ElevatedButton.styleFrom(
-                    textStyle: TextStyle(
-                      fontFamily: GoogleFonts.sora(fontWeight: FontWeight.w600)
-                          .fontFamily,
-                      // fontFamily: GoogleFonts.varelaRound().fontFamily,
-                      // fontFamily: GoogleFonts.mPlusRounded1c().fontFamily,
-                      // fontFamily: GoogleFonts.indieFlower().fontFamily,
-                      // fontWeight: FontWeight.w900,
-                      letterSpacing: 0.4,
+                      validator: (value) {
+                        final RegExp isvaliduid = RegExp(r'^[0-9]+$');
+                        return validateInputs(
+                            value, "ID", "non numeric charachter", isvaliduid);
+                      },
                     ),
-                    minimumSize: const Size(140, 40),
-                    // primary: Colors.amber, text color
-                    // surfaceTintColor: Colors.yellow,
-                    shadowColor: const Color.fromRGBO(00, 44, 255, 1.0),
-                    // backgroundColor: Colors.black, btn clr 4 textbutton
-                    shape: changeButton
-                        ? const CircleBorder()
-                        : const StadiumBorder(),
-                    padding: changeButton
-                        ? const EdgeInsets.all(11)
-                        : const EdgeInsets.all(0),
-                    animationDuration: const Duration(milliseconds: 500)),
-                child:
-                    changeButton ? const Icon(Icons.done) : const Text("Login"),
+                    TextFormField(
+                      maxLength: 30,
+                      controller: _pas,
+                      decoration: const InputDecoration(
+                        icon: Icon(
+                          Icons.lock,
+                          color: Colors.blue,
+                        ),
+                        hintText: "Enter Employee password",
+                        labelText: "Password",
+                      ),
+                      obscureText: true,
+                      validator: (value) {
+                        RegExp isvalid = RegExp(r'^[a-zA-Z0-9\*\#\$\&]+$');
+                        return validateInputs(
+                            value, "Password", "special charachters", isvalid,
+                            numOfChars: 6);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+            ElevatedButton(
+              onPressed: validateLogin,
+              style: ElevatedButton.styleFrom(
+                  textStyle: TextStyle(
+                    fontFamily: GoogleFonts.sora(fontWeight: FontWeight.w600)
+                        .fontFamily,
+                    letterSpacing: 0.4,
+                  ),
+                  minimumSize: const Size(140, 40),
+                  shadowColor: const Color.fromRGBO(00, 44, 255, 1.0),
+                  shape: changeButton
+                      ? const CircleBorder()
+                      : const StadiumBorder(),
+                  padding: changeButton
+                      ? const EdgeInsets.all(11)
+                      : const EdgeInsets.all(0),
+                  animationDuration: const Duration(milliseconds: 500)),
+              child:
+                  changeButton ? const Icon(Icons.done) : const Text("Login"),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 // <a href="https://lovepik.com/images/png-computer.html">Computer Png vectors by Lovepik.com</a>

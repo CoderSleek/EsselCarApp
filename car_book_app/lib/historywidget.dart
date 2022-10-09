@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 class HistoryData {
   late int bookingID;
@@ -28,15 +27,6 @@ class HistoryData {
     pickupDateTime = item['pickupDateTime'];
     arrivalDateTime = item['arrivalDateTime'];
     canFillTime = item['canFillTime'];
-    // final RegExp dt = RegExp(r'^([\d]+)-(\d\d)-(\d\d).(\d\d):(\d\d)');
-    // RegExpMatch? match = dt.firstMatch(item['pickupDateTime']);
-
-    // pickupDateTime =
-    //     '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
-
-    // match = dt.firstMatch(item['arrivalDateTime']);
-    // arrivalDateTime =
-    //     '${match?[4]}:${match?[5]} ${match?[3]}-${match?[2]}-${match?[1]}';
   }
 }
 
@@ -46,18 +36,16 @@ class HistoryWidget extends StatefulWidget {
   final HistoryData data;
   final int index;
 
-  const HistoryWidget({required this.data, this.index = 0});
+  const HistoryWidget({required this.data, this.index = 0, super.key});
 
   static Future<void> getHistory() async {
     histories = [];
     try {
       http.Response res = await http
           .get(Uri.http(MyApp.backendIP, '/history/${MyApp.userInfo['uid']}'));
-      List<dynamic> temp = jsonDecode(res.body);
+      histories = jsonDecode(res.body);
 
-      for (int i = 0; i < temp.length; ++i) {
-        histories.add(HistoryData.fromJson(temp[i]));
-      }
+      histories = histories.map((ele) => HistoryData.fromJson(ele)).toList();
     } catch (err) {
       Fluttertoast.showToast(
         msg: 'Connection Error',
@@ -100,6 +88,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
           Uri.http(MyApp.backendIP, '/travelData'),
           headers: <String, String>{'Content-Type': 'application/json'},
           body: jsonEncode(packet));
+
       if (response.statusCode == 202) {
         return true;
       } else {
@@ -239,6 +228,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                 setState(() {
                   widget.data.canFillTime = false;
                 });
+
                 Navigator.of(context).pop();
               },
               child: const Text("Submit"),
@@ -272,8 +262,6 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         dense: true,
-        // horizontalTitleGap: 30,
-        // leading: Text(this.index.toString()),
         onTap: openTimeFillPopup,
       ),
     );

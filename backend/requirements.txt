@@ -1,10 +1,14 @@
 fastapi
 uvicorn
-pathlib
+pydantic
+typing
 pyodbc
-json
 datetime
 re
+traceback
+smtplib
+email
+enum
 pyjwt==2.4.0
 python-decouple==3.6
 time

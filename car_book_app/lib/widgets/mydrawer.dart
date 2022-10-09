@@ -1,4 +1,3 @@
-import 'package:car_book_app/home_login.dart';
 import 'package:car_book_app/main.dart';
 import 'package:car_book_app/utils/routes.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,15 +21,11 @@ class MyDrawer extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 currentAccountPictureSize:
                     Size(MediaQuery.of(context).size.width * 0.70, 100),
-                // currentAccountPicture: Image.asset(
-                //   'assets/logo.png',
-                // ),
                 currentAccountPicture: const Icon(
                   CupertinoIcons.person_crop_circle,
                   size: 80,
                   color: Colors.white70,
                 ),
-                // margin: EdgeInsets.zero,
                 accountName: Text(
                   MyApp.userInfo['name'],
                   style: TextStyle(
