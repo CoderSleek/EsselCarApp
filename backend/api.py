@@ -10,9 +10,10 @@ from typing import Optional
 
 import jwt_handler as jwt
 from mail import Email_manager, Email_requests
-from login_handler import db_handler as db_emp_det
-from booking_handler import db_handler as db_book_inf
-from vehicle_handler import db_handler as db_veh_info
+# from login_handler import db_handler as db_emp_det
+# from booking_handler import db_handler as db_book_inf
+# from vehicle_handler import db_handler as db_veh_info
+from fake_db import db_book_inf, db_emp_det, db_veh_info
 
 from datetime import datetime, date, time
 from re import findall, match, compile as compile_
@@ -128,7 +129,7 @@ def createNewbooking(req: NewBooking, response: Response) -> dict:
         req.reqDateTime = str(datetime.now()).split('.')[0]
         manager_details = db_emp_det().get_mng_details(req.uid)
         req.managerID = manager_details.emp_id
-
+        print(req.arrivalDateTime, req.pickupDateTime, req.reqDateTime)
     except Exception as err:
         _write_to_log_file(err)
         response.status_code = status.HTTP_406_NOT_ACCEPTABLE

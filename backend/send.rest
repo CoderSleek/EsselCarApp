@@ -83,15 +83,15 @@ Authorization: some_random_token
 
 ###
 
-GET http://localhost:5000/getmanagerrequests?mng_id=5
+GET http://localhost:5000/getmanagerrequests?emp_id=2
 
 ###
 
 PUT http://localhost:5000/approval
 
 {   
-    "bookingID":6,
-    "status": false,
+    "bookingID":1,
+    "status": true,
     "comments": ""
 }
 
