@@ -20,6 +20,7 @@ async function verifyLogin(){
             sessionStorage.setItem('accessToken', token);
             window.location.href = BACKEND_URL+'adminpage'; /*change webpage to another html response by endpoint*/
         }
+        // console.log('hello');
     } catch (err) {
         alert('Some error Occured');
     }
